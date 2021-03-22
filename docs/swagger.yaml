@@ -1,0 +1,17 @@
+basePath: /api
+host: 127.0.0.1:8585
+info:
+  contact: {}
+  description: Conduit API
+  title: Conduit API
+  version: "1.0"
+paths: {}
+schemes:
+- http
+- https
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
