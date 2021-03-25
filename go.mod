@@ -15,8 +15,9 @@ require (
 	github.com/labstack/gommon v0.3.0
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-colorable v0.1.8 // indirect
+	github.com/rs/xid v1.2.1
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
-	github.com/swaggo/echo-swagger v1.1.0 // indirect
+	github.com/swaggo/echo-swagger v1.1.0
 	github.com/swaggo/swag v1.7.0
 	go.mongodb.org/mongo-driver v1.4.6
 	golang.org/x/crypto v0.0.0-20210220033148-5ea612d1eb83 // indirect

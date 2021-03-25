@@ -1,17 +1,18 @@
 package db
 
 import (
-	_ "github.com/joho/godotenv/autoload" // read .env on import
-	"os"
 	"context"
-	"sync"
+	_ "github.com/joho/godotenv/autoload" // read .env on import
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"os"
+	"sync"
 )
 
 /* Used to create a singleton object of MongoDB client. */
 var clientDatabase *mongo.Database
 var clientInstanceError error
+
 //Used to execute client creation procedure only once.
 var mongoOnce sync.Once
 
