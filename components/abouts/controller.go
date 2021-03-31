@@ -2,16 +2,16 @@ package abouts
 
 import (
 	"context"
-	"path/filepath"
 	"github.com/labstack/echo/v4"
 	DB "github.com/muhammadardie/echo-cms/db"
+	"github.com/rs/xid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"github.com/rs/xid"
 	"io"
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"time"
 )
 
@@ -56,7 +56,7 @@ func Find(c echo.Context) error {
 	var record Abouts
 
 	if err = db.Collection("abouts").FindOne(ctx, selector).Decode(&record); err != nil {
-	    return echo.NewHTTPError(http.StatusBadRequest, err)
+		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 
 	return c.JSON(http.StatusOK, record)
@@ -134,29 +134,29 @@ func Update(c echo.Context) error {
 
 	selector := bson.M{"_id": id}
 
-    changes := &Abouts{
-		Title:     c.FormValue("title"),
-		Desc:      c.FormValue("desc"),
-		Image: 	   "",
+	changes := &Abouts{
+		Title: c.FormValue("title"),
+		Desc:  c.FormValue("desc"),
+		Image: "",
 	}
 
 	/* check image exist first */
 	file, err := c.FormFile("image")
-	// if no error then there is valid image request 
+	// if no error then there is valid image request
 	if err == nil {
 		/* delete existing file if exist */
 		path := "./uploaded_files/about/"
 		var record Abouts
 
 		if err = db.Collection("abouts").FindOne(ctx, selector).Decode(&record); err != nil {
-		    return echo.NewHTTPError(http.StatusBadRequest, err)
+			return echo.NewHTTPError(http.StatusBadRequest, err)
 		}
 
 		if record.Image != "" {
-			err := os.Remove(path+record.Image)
+			err := os.Remove(path + record.Image)
 
 			if err != nil {
-			  return echo.NewHTTPError(http.StatusBadRequest, err)
+				return echo.NewHTTPError(http.StatusBadRequest, err)
 			}
 		}
 
@@ -188,7 +188,7 @@ func Update(c echo.Context) error {
 
 	_, err = db.Collection("abouts").UpdateOne(ctx, selector, bson.M{"$set": changes})
 	if err != nil {
-	    return echo.NewHTTPError(http.StatusBadRequest, err)
+		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 
 	return c.JSON(http.StatusOK, changes)
@@ -215,14 +215,14 @@ func Destroy(c echo.Context) error {
 	var record Abouts
 
 	if err = db.Collection("abouts").FindOne(ctx, selector).Decode(&record); err != nil {
-	    return echo.NewHTTPError(http.StatusBadRequest, err)
+		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 
 	if record.Image != "" {
-		err := os.Remove(path+record.Image)
+		err := os.Remove(path + record.Image)
 
 		if err != nil {
-		  return echo.NewHTTPError(http.StatusBadRequest, err)
+			return echo.NewHTTPError(http.StatusBadRequest, err)
 		}
 	}
 
@@ -230,7 +230,7 @@ func Destroy(c echo.Context) error {
 	result, err := db.Collection("abouts").DeleteOne(ctx, selector)
 
 	if err != nil {
-	    return echo.NewHTTPError(http.StatusBadRequest, err)
+		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 
 	return c.JSON(http.StatusOK, result)
