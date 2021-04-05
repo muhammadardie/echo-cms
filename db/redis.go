@@ -7,7 +7,7 @@ import (
 
 var client *redis.Client
 
-func InitRedis() (*redis.Client){
+func InitRedis() *redis.Client {
 	//Initializing redis
 	client = redis.NewClient(&redis.Options{
 		Addr:     os.Getenv("REDIS_ADDRESS"),

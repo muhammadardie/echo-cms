@@ -2,13 +2,13 @@ package auth
 
 import (
 	"context"
-	"time"
 	"github.com/labstack/echo/v4"
 	"github.com/muhammadardie/echo-cms/components/users"
 	DB "github.com/muhammadardie/echo-cms/db"
 	"go.mongodb.org/mongo-driver/bson"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
+	"time"
 )
 
 var ctx = context.Background()
@@ -49,35 +49,35 @@ func Login(c echo.Context) error {
 
 	ts, err := CreateToken(dbUser.ID.Hex())
 	if err != nil {
- 		return echo.NewHTTPError(http.StatusUnprocessableEntity, err.Error())
+		return echo.NewHTTPError(http.StatusUnprocessableEntity, err.Error())
 	}
 
 	saveErr := CreateAuth(dbUser.ID.Hex(), ts)
 	if saveErr != nil {
-	    return echo.NewHTTPError(http.StatusUnprocessableEntity, err.Error())
+		return echo.NewHTTPError(http.StatusUnprocessableEntity, err.Error())
 	}
 
 	tokens := map[string]string{
-	    "access_token":  ts.AccessToken,
-	    "refresh_token": ts.RefreshToken,
+		"access_token":  ts.AccessToken,
+		"refresh_token": ts.RefreshToken,
 	}
 
 	return c.JSON(http.StatusOK, tokens)
 }
 
 func Logout(c echo.Context) error {
-  au, err := ExtractTokenMetadata(c)
+	au, err := ExtractTokenMetadata(c)
 
-  if err != nil {
-    return c.JSON(http.StatusUnauthorized, err.Error())
-  }
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, err.Error())
+	}
 
-  delErr := DeleteAuth(au.AccessUuid)
-  if delErr != nil { //if any goes wrong
-    return c.JSON(http.StatusUnauthorized, delErr)
-  }
+	delErr := DeleteAuth(au.AccessUuid)
+	if delErr != nil { //if any goes wrong
+		return c.JSON(http.StatusUnauthorized, delErr)
+	}
 
-  return c.JSON(http.StatusOK, "Successfully logged out")
+	return c.JSON(http.StatusOK, "Successfully logged out")
 }
 
 func CreateAuth(userid string, td *TokenDetails) error {
@@ -85,7 +85,7 @@ func CreateAuth(userid string, td *TokenDetails) error {
 	at := time.Unix(td.AtExpires, 0) //converting Unix to UTC(to Time object)
 	rt := time.Unix(td.RtExpires, 0)
 	now := time.Now()
-	
+
 	errAccess := client.Set(ctx, td.TokenUuid, userid, at.Sub(now)).Err()
 	if errAccess != nil {
 		return errAccess
@@ -102,19 +102,19 @@ func CreateAuth(userid string, td *TokenDetails) error {
 func FetchAuth(authD *AccessDetails) (string, error) {
 	client := DB.InitRedis()
 	userid, err := client.Get(ctx, authD.AccessUuid).Result()
-	if err        != nil {
-    	return "", err
-  	}
+	if err != nil {
+		return "", err
+	}
 
-  	return userid, nil
+	return userid, nil
 }
 
 func DeleteAuth(accessUuid string) error {
 	client := DB.InitRedis()
-  	err := client.Del(ctx, accessUuid).Err()
-  	if err != nil {
-    	return err
-  	}
-  
-  	return nil
+	err := client.Del(ctx, accessUuid).Err()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

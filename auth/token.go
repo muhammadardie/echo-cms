@@ -1,14 +1,14 @@
 package auth
 
 import (
-	"github.com/labstack/echo/v4"
+	"fmt"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/labstack/echo/v4"
 	"github.com/rs/xid"
 	"os"
-	"time"
 	"strings"
-	"fmt"
-
+	"time"
+	"net/http"
 )
 
 type tokenService struct{}
@@ -23,8 +23,8 @@ type TokenDetails struct {
 }
 
 type AccessDetails struct {
-    AccessUuid string
-    UserId   string
+	AccessUuid string
+	UserId     string
 }
 
 func CreateToken(userId string) (*TokenDetails, error) {
@@ -63,12 +63,12 @@ func CreateToken(userId string) (*TokenDetails, error) {
 
 func ExtractToken(c echo.Context) string {
 	bearToken := c.Request().Header.Get("Authorization")
-	
+
 	strArr := strings.Split(bearToken, " ")
 	if len(strArr) == 2 {
 		return strArr[1]
 	}
-	
+
 	return ""
 }
 
@@ -79,7 +79,7 @@ func VerifyToken(c echo.Context) (*jwt.Token, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		
+
 		return []byte(os.Getenv("ACCESS_SECRET")), nil
 	})
 
@@ -98,7 +98,7 @@ func TokenValid(c echo.Context) error {
 	if _, ok := token.Claims.(jwt.Claims); !ok && !token.Valid {
 		return err
 	}
-	
+
 	return nil
 }
 
@@ -112,12 +112,69 @@ func ExtractTokenMetadata(c echo.Context) (*AccessDetails, error) {
 	if token.Valid {
 		accessUuid := claims["access_uuid"].(string)
 		userId := claims["user_id"].(string)
-		
+
 		return &AccessDetails{
 			AccessUuid: accessUuid,
-			UserId:   userId,
+			UserId:     userId,
 		}, nil
 	}
-	
+
 	return nil, err
+}
+
+func Refresh(c echo.Context) error {
+	mapToken := map[string]string{}
+
+	if err := c.Bind(&mapToken); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	
+	refreshToken := mapToken["refresh_token"]
+	token, err := jwt.Parse(refreshToken, func(token *jwt.Token) (interface{}, error) {
+		//Make sure that the token method conform to "SigningMethodHMAC"
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte(os.Getenv("REFRESH_SECRET")), nil
+	})
+	//if there is an error, the token must have expired
+	if err != nil {
+		return echo.NewHTTPError(http.StatusUnauthorized, "Refresh token expired")
+	}
+	//is token valid?
+	if _, ok := token.Claims.(jwt.Claims); !ok && !token.Valid {
+		return echo.NewHTTPError(http.StatusUnauthorized, "Refresh token expired")
+	}
+
+	//Since token is valid, get the uuid:
+	claims, ok := token.Claims.(jwt.MapClaims) //the token claims should conform to MapClaims
+	if ok && token.Valid {
+		refreshUuid := claims["refresh_uuid"].(string) //convert the interface to string
+		userId := claims["user_id"].(string)
+
+		//Delete the previous Refresh Token
+		delErr := DeleteAuth(refreshUuid)
+		if delErr != nil { //if any goes wrong
+			return echo.NewHTTPError(http.StatusUnprocessableEntity, "Failed refresh token")
+		}
+		//Create new pairs of refresh and access tokens
+		ts, createErr := CreateToken(userId)
+		if createErr != nil {
+			return echo.NewHTTPError(http.StatusForbidden, createErr.Error())
+		}
+		//save the tokens metadata to redis
+		saveErr := CreateAuth(userId, ts)
+		if saveErr != nil {
+			return echo.NewHTTPError(http.StatusForbidden, saveErr.Error())
+		}
+		tokens := map[string]string{
+			"access_token":  ts.AccessToken,
+			"refresh_token": ts.RefreshToken,
+		}
+
+		return c.JSON(http.StatusCreated, tokens)
+	} else {
+
+		return c.JSON(http.StatusUnauthorized, "refresh expired")
+	}
 }

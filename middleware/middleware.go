@@ -6,8 +6,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
-	"net/http"
 	"github.com/muhammadardie/echo-cms/auth"
+	"net/http"
 )
 
 type CustomValidator struct {
@@ -66,24 +66,24 @@ func (cv *CustomValidator) Validate(i interface{}) error {
 }
 
 func TokenAuthMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
-  const unauthorizedMessage = "Unauthorized, your request could not be processed"
+	const unauthorizedMessage = "Error: Access Token is not valid or has expired"
 
-  return func(c echo.Context) error {
-    err := auth.TokenValid(c) // check jwt still valid
-    tokenAuth, err := auth.ExtractTokenMetadata(c)
-  	if err != nil {
-  		return c.JSON(http.StatusUnauthorized, unauthorizedMessage)
-  	}
+	return func(c echo.Context) error {
+		err := auth.TokenValid(c) // check jwt still valid
+		if err != nil {
+			return c.JSON(http.StatusUnauthorized, unauthorizedMessage)
+		}
 
- 	_, err = auth.FetchAuth(tokenAuth) // check jwt still exist in redis
-  	if err != nil {
-    	return c.JSON(http.StatusUnauthorized, unauthorizedMessage)
-  	}
+		tokenAuth, err := auth.ExtractTokenMetadata(c)
+		if err != nil {
+			return c.JSON(http.StatusUnauthorized, unauthorizedMessage)
+		}
 
-    if err != nil {
-    	return c.JSON(http.StatusUnauthorized, unauthorizedMessage)
-    }
+		_, err = auth.FetchAuth(tokenAuth) // check jwt still exist in redis
+		if err != nil {
+			return c.JSON(http.StatusUnauthorized, unauthorizedMessage)
+		}
 
-    return next(c)
-  }
+		return next(c)
+	}
 }
