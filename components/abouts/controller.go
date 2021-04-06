@@ -8,36 +8,54 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 	"time"
 )
 
+// Get Abouts godoc
+// @Summary Get recent info about
+// @Description get most recent info about
+// @ID get-abouts
+// @Tags Abouts
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} Abouts
+// @Router /abouts [get]
 func Get(c echo.Context) error {
 	var ctx = context.Background()
 
 	db, err := DB.Connect()
 	if err != nil {
-		log.Fatal(err.Error())
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	csr, err := db.Collection("abouts").Find(ctx, bson.M{})
 	if err != nil {
-		log.Fatal(err.Error())
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	defer csr.Close(ctx)
 
 	result := make([]Abouts, 0)
 	if err = csr.All(ctx, &result); err != nil {
-		log.Fatal(err)
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	return c.JSON(http.StatusOK, result)
 }
 
+// Find Abouts godoc
+// @Summary Find info abouts by ID
+// @Description Find info abouts by ID
+// @ID find-abouts
+// @Tags Abouts
+// @Accept  json
+// @Produce  json
+// @Param id path string true "ID of the about to get"
+// @Success 200 {object} Abouts
+// @Router /abouts/{id} [get]
 func Find(c echo.Context) error {
 	ctx := context.Background()
 	id, err := primitive.ObjectIDFromHex(c.Param("id"))
@@ -62,6 +80,17 @@ func Find(c echo.Context) error {
 	return c.JSON(http.StatusOK, record)
 }
 
+// Create About godoc
+// @Summary Create an info for page about
+// @Description Create an info for page about
+// @ID create-abouts
+// @Tags Abouts
+// @Accept  json
+// @Produce  json
+// @Param about body Abouts true "Info about you want to create"
+// @Success 200 {object} Abouts
+// @Success 200 {object} []string{title=string,image=string,desc=string}
+// @Router /abouts [post]
 func Create(c echo.Context) error {
 	var ctx = context.Background()
 
@@ -73,7 +102,7 @@ func Create(c echo.Context) error {
 
 	db, err := DB.Connect()
 	if err != nil {
-		log.Fatal(err.Error())
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	src, err := file.Open()
@@ -119,6 +148,17 @@ func Create(c echo.Context) error {
 	return c.JSON(http.StatusOK, abouts)
 }
 
+// Update About godoc
+// @Summary Update an info for page about
+// @Description Update an info for page about
+// @ID update-about
+// @Tags Abouts
+// @Accept  json
+// @Produce  json
+// @Param id path string true "ID of the about to get"
+// @Param about body Abouts true "Info about you want to create"
+// @Success 200 {object} Abouts
+// @Router /abouts/{id} [put]
 func Update(c echo.Context) error {
 	ctx := context.Background()
 	id, err := primitive.ObjectIDFromHex(c.Param("id"))
@@ -195,6 +235,16 @@ func Update(c echo.Context) error {
 
 }
 
+// Delete Abouts godoc
+// @Summary Delete an about info
+// @Description Delete an about info
+// @ID delete-about
+// @Tags Abouts
+// @Accept  json
+// @Produce  json
+// @Param id path string true "ID of the about"
+// @Success 200 {object} Abouts
+// @Router /abouts/{id} [delete]
 func Destroy(c echo.Context) error {
 	ctx := context.Background()
 	id, err := primitive.ObjectIDFromHex(c.Param("id"))

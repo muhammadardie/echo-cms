@@ -13,6 +13,16 @@ import (
 
 var ctx = context.Background()
 
+// Login godoc
+// @Summary Login for existing user
+// @Description Login for existing user
+// @ID login
+// @Tags user
+// @Accept  json
+// @Produce  json
+// @Param user body users.Users true "Credentials to use"
+// @Success 200 {object} []string{access_token=string,refresh_token=string}
+// @Router /login [post]
 func Login(c echo.Context) error {
 	ctx := context.Background()
 	user := new(users.Users)
