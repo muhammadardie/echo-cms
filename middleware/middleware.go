@@ -7,6 +7,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
 	"github.com/muhammadardie/echo-cms/auth"
+	"github.com/muhammadardie/echo-cms/utils"
 	"net/http"
 )
 
@@ -57,8 +58,10 @@ func ErrorHandler(err error, c echo.Context) {
 		}
 	}
 
+	message := fmt.Sprintf("%v", report.Message)
+
 	c.Logger().Error(report)
-	c.JSON(report.Code, report)
+	c.JSON(report.Code, utils.NewError(report.Code, message))
 }
 
 func (cv *CustomValidator) Validate(i interface{}) error {
@@ -71,7 +74,7 @@ func TokenAuthMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		err := auth.TokenValid(c) // check jwt still valid
 		if err != nil {
-			return c.JSON(http.StatusUnauthorized, unauthorizedMessage)
+			return echo.NewHTTPError(http.StatusUnauthorized, unauthorizedMessage)
 		}
 
 		tokenAuth, err := auth.ExtractTokenMetadata(c)

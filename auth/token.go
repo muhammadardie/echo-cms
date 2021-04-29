@@ -5,10 +5,10 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo/v4"
 	"github.com/rs/xid"
+	"net/http"
 	"os"
 	"strings"
 	"time"
-	"net/http"
 )
 
 type tokenService struct{}
@@ -128,7 +128,7 @@ func Refresh(c echo.Context) error {
 	if err := c.Bind(&mapToken); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	
+
 	refreshToken := mapToken["refresh_token"]
 	token, err := jwt.Parse(refreshToken, func(token *jwt.Token) (interface{}, error) {
 		//Make sure that the token method conform to "SigningMethodHMAC"

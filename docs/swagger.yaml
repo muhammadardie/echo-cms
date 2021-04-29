@@ -2,11 +2,11 @@ basePath: /api
 definitions:
   abouts.Abouts:
     properties:
-      _id:
-        type: string
       createdAt:
         type: string
       desc:
+        type: string
+      id:
         type: string
       image:
         type: string
@@ -14,6 +14,29 @@ definitions:
         type: string
       updatedAt:
         type: string
+    required:
+    - desc
+    - image
+    - title
+    type: object
+  blogs.Blogs:
+    properties:
+      content:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: string
+      image:
+        type: string
+      title:
+        type: string
+      updatedAt:
+        type: string
+    required:
+    - content
+    - image
+    - title
     type: object
   users.Users:
     properties:
@@ -25,7 +48,31 @@ definitions:
     - email
     - password
     type: object
-host: 127.0.0.1:8585
+  utils.HttpError:
+    properties:
+      code:
+        example: 500
+        type: integer
+      message:
+        type: string
+      success:
+        default: false
+        type: boolean
+    type: object
+  utils.HttpSuccess:
+    properties:
+      code:
+        example: 200
+        type: integer
+      data:
+        type: object
+      message:
+        type: string
+      success:
+        default: true
+        type: boolean
+    type: object
+host: 127.0.0.1:8080
 info:
   contact: {}
   description: Conduit API
@@ -36,7 +83,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: get most recent info about
+      description: Get most recent info about
       operationId: get-abouts
       produces:
       - application/json
@@ -44,40 +91,57 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/abouts.Abouts'
+            allOf:
+            - $ref: '#/definitions/utils.HttpSuccess'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/abouts.Abouts'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
       summary: Get recent info about
       tags:
       - Abouts
     post:
       consumes:
-      - application/json
+      - multipart/form-data
       description: Create an info for page about
       operationId: create-abouts
       parameters:
-      - description: Info about you want to create
-        in: body
-        name: about
+      - description: Abouts image
+        in: formData
+        name: image
         required: true
-        schema:
-          $ref: '#/definitions/abouts.Abouts'
+        type: file
+      - description: Abouts title
+        in: formData
+        name: title
+        required: true
+        type: string
+      - description: Abouts description
+        in: formData
+        name: desc
+        required: true
+        type: string
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            items:
-              allOf:
-              - type: string
-              - properties:
-                  desc:
-                    type: string
-                  image:
-                    type: string
-                  title:
-                    type: string
-                type: object
-            type: array
+            $ref: '#/definitions/abouts.Abouts'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
       summary: Create an info for page about
       tags:
       - Abouts
@@ -100,6 +164,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/abouts.Abouts'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
       summary: Delete an about info
       tags:
       - Abouts
@@ -120,27 +188,44 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/abouts.Abouts'
+            allOf:
+            - $ref: '#/definitions/utils.HttpSuccess'
+            - properties:
+                data:
+                  $ref: '#/definitions/abouts.Abouts'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
       summary: Find info abouts by ID
       tags:
       - Abouts
     put:
       consumes:
-      - application/json
+      - multipart/form-data
       description: Update an info for page about
       operationId: update-about
       parameters:
-      - description: ID of the about to get
+      - description: ID of blog to get
         in: path
         name: id
         required: true
         type: string
-      - description: Info about you want to create
-        in: body
-        name: about
-        required: true
-        schema:
-          $ref: '#/definitions/abouts.Abouts'
+      - description: Abouts image
+        in: formData
+        name: image
+        type: file
+      - description: Abouts title
+        in: formData
+        name: title
+        type: string
+      - description: Abouts description
+        in: formData
+        name: desc
+        type: string
       produces:
       - application/json
       responses:
@@ -148,9 +233,179 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/abouts.Abouts'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
       summary: Update an info for page about
       tags:
       - Abouts
+  /blogs:
+    get:
+      consumes:
+      - application/json
+      operationId: get-blogs
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.HttpSuccess'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/blogs.Blogs'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Get recent blog
+      tags:
+      - Blogs
+    post:
+      consumes:
+      - multipart/form-data
+      description: Create a blog content
+      operationId: create-blogs
+      parameters:
+      - description: Blog image
+        in: formData
+        name: image
+        required: true
+        type: file
+      - description: Blog title
+        in: formData
+        name: title
+        required: true
+        type: string
+      - description: Blog content
+        in: formData
+        name: content
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/blogs.Blogs'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Create blog
+      tags:
+      - Blogs
+  /blogs/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a blog
+      operationId: delete-blog
+      parameters:
+      - description: ID of the blog
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/blogs.Blogs'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Delete a blog
+      tags:
+      - Blogs
+    get:
+      consumes:
+      - application/json
+      description: Find blog by ID
+      operationId: find-blogs
+      parameters:
+      - description: ID of the blog to get
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.HttpSuccess'
+            - properties:
+                data:
+                  $ref: '#/definitions/blogs.Blogs'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Find blog by ID
+      tags:
+      - Blogs
+    put:
+      consumes:
+      - multipart/form-data
+      description: Update blog
+      operationId: update-blog
+      parameters:
+      - description: ID of blog to get
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Blog image
+        in: formData
+        name: image
+        type: file
+      - description: Blog title
+        in: formData
+        name: title
+        type: string
+      - description: Blog content
+        in: formData
+        name: content
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/blogs.Blogs'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Update blog
+      tags:
+      - Blogs
   /login:
     post:
       consumes:
@@ -170,24 +425,59 @@ paths:
         "200":
           description: OK
           schema:
-            items:
-              allOf:
-              - type: string
-              - properties:
-                  access_token:
-                    type: string
-                  refresh_token:
-                    type: string
-                type: object
-            type: array
+            allOf:
+            - $ref: '#/definitions/utils.HttpSuccess'
+            - properties:
+                data:
+                  allOf:
+                  - type: string
+                  - properties:
+                      access_token:
+                        type: string
+                      refresh_token:
+                        type: string
+                    type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HttpError'
       summary: Login for existing user
       tags:
-      - user
+      - Auth
+  /logout:
+    post:
+      description: Logout for existing user
+      operationId: logout
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.HttpSuccess'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Logout for existing user
+      tags:
+      - Auth
 schemes:
 - http
 - https
 securityDefinitions:
-  ApiKeyAuth:
+  Bearer:
     in: header
     name: Authorization
     type: apiKey

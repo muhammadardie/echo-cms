@@ -5,6 +5,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/muhammadardie/echo-cms/components/users"
 	DB "github.com/muhammadardie/echo-cms/db"
+	"github.com/muhammadardie/echo-cms/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
@@ -17,11 +18,14 @@ var ctx = context.Background()
 // @Summary Login for existing user
 // @Description Login for existing user
 // @ID login
-// @Tags user
+// @Tags Auth
 // @Accept  json
 // @Produce  json
 // @Param user body users.Users true "Credentials to use"
-// @Success 200 {object} []string{access_token=string,refresh_token=string}
+// @Success 200 {object} utils.HttpSuccess{data=string{access_token=string,refresh_token=string}}
+// @Failure 400 {object} utils.HttpError
+// @Failure 401 {object} utils.HttpError
+// @Failure 500 {object} utils.HttpError
 // @Router /login [post]
 func Login(c echo.Context) error {
 	ctx := context.Background()
@@ -38,14 +42,14 @@ func Login(c echo.Context) error {
 
 	db, err := DB.Connect()
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	selector := bson.M{"email": user.Email}
 	var dbUser users.Users
 
 	if err = db.Collection("users").FindOne(ctx, selector).Decode(&dbUser); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "Users not found")
+		return echo.NewHTTPError(http.StatusUnauthorized, "User not found")
 	}
 
 	// Comparing the password with the hash
@@ -54,7 +58,7 @@ func Login(c echo.Context) error {
 	passErr := bcrypt.CompareHashAndPassword(dbPass, userPass)
 
 	if passErr != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "Invalid password")
+		return echo.NewHTTPError(http.StatusUnauthorized, "Invalid password")
 	}
 
 	ts, err := CreateToken(dbUser.ID.Hex())
@@ -72,22 +76,32 @@ func Login(c echo.Context) error {
 		"refresh_token": ts.RefreshToken,
 	}
 
-	return c.JSON(http.StatusOK, tokens)
+	return c.JSON(http.StatusOK, utils.NewSuccess(tokens, "Successfully logged in"))
 }
 
+// Logout godoc
+// @Summary Logout for existing user
+// @Description Logout for existing user
+// @ID logout
+// @Tags Auth
+// @Produce  json
+// @Security Bearer
+// @Success 200 {object} utils.HttpSuccess
+// @Failure 401 {object} utils.HttpError
+// @Router /logout [post]
 func Logout(c echo.Context) error {
 	au, err := ExtractTokenMetadata(c)
 
 	if err != nil {
-		return c.JSON(http.StatusUnauthorized, err.Error())
+		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
 	}
 
 	delErr := DeleteAuth(au.AccessUuid)
 	if delErr != nil { //if any goes wrong
-		return c.JSON(http.StatusUnauthorized, delErr)
+		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
 	}
 
-	return c.JSON(http.StatusOK, "Successfully logged out")
+	return c.JSON(http.StatusOK, utils.NewSuccess("", "Successfully logged out"))
 }
 
 func CreateAuth(userid string, td *TokenDetails) error {
