@@ -1,4 +1,4 @@
-package users
+package services
 
 import (
 	"context"
@@ -7,27 +7,26 @@ import (
 	"github.com/muhammadardie/echo-cms/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"time"
 )
 
 var ctx = context.Background()
 
-const colName = "users"
+const colName = "services"
 
-// Get Users godoc
-// @Summary Get recent user
-// @Description Get most recent user
-// @ID get-users
-// @Tags Users
+// Get Services godoc
+// @Summary Get recent service
+// @Description Get most recent service
+// @ID get-services
+// @Tags Services
 // @Accept  json
 // @Produce  json
 // @Security Bearer
-// @Success 200 {object} utils.HttpSuccess{data=[]Users}
+// @Success 200 {object} utils.HttpSuccess{data=[]Services}
 // @Failure 400 {object} utils.HttpError
 // @Failure 401 {object} utils.HttpError
-// @Router /users [get]
+// @Router /services [get]
 func Get(c echo.Context) error {
 	db, err := DB.Connect()
 	if err != nil {
@@ -41,7 +40,7 @@ func Get(c echo.Context) error {
 
 	defer csr.Close(ctx)
 
-	result := make([]Users, 0)
+	result := make([]Services, 0)
 	if err = csr.All(ctx, &result); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
@@ -49,19 +48,19 @@ func Get(c echo.Context) error {
 	return c.JSON(http.StatusOK, utils.NewSuccess(result, ""))
 }
 
-// Find Users godoc
-// @Summary Find info users by ID
-// @Description Find info users by ID
-// @ID find-users
-// @Tags Users
+// Find Services godoc
+// @Summary Find info services by ID
+// @Description Find info services by ID
+// @ID find-services
+// @Tags Services
 // @Accept  json
 // @Produce  json
 // @Security Bearer
-// @Param id path string true "ID of the user to get"
-// @Success 200 {object} utils.HttpSuccess{data=Users}
+// @Param id path string true "ID of the service to get"
+// @Success 200 {object} utils.HttpSuccess{data=Services}
 // @Failure 400 {object} utils.HttpError
 // @Failure 401 {object} utils.HttpError
-// @Router /users/{id} [get]
+// @Router /services/{id} [get]
 func Find(c echo.Context) error {
 	id, err := primitive.ObjectIDFromHex(c.Param("id"))
 
@@ -76,7 +75,7 @@ func Find(c echo.Context) error {
 
 	selector := bson.M{"_id": id}
 
-	var record Users
+	var record Services
 
 	if err = db.Collection(colName).FindOne(ctx, selector).Decode(&record); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
@@ -85,79 +84,62 @@ func Find(c echo.Context) error {
 	return c.JSON(http.StatusOK, utils.NewSuccess(record, ""))
 }
 
-// Create Users godoc
-// @Summary Create an info for page user
-// @Description Create an info for page user
-// @ID create-users
-// @Tags Users
+// Create Services godoc
+// @Summary Create an info for page service
+// @Description Create an info for page service
+// @ID create-services
+// @Tags Services
 // @Accept  json
 // @Produce  json
 // @Security Bearer
-// @Param username body string true "Users username"
-// @Param password body string true "Users password"
-// @Param email body string true "Users email"
-// @Success 200 {object} Users
+// @Param title body string true "Services title"
+// @Param icon body string true "Services icon"
+// @Param desc body string true "Services desc"
+// @Success 200 {object} Services
 // @Failure 400 {object} utils.HttpError
 // @Failure 401 {object} utils.HttpError
-// @Failure 500 {object} utils.HttpError
-// @Router /users [post]
+// @Router /services [post]
 func Create(c echo.Context) error {
-
-	/* check password */
-	passValue := c.FormValue("password")
-	if passValue == "" {
-        return echo.NewHTTPError(http.StatusInternalServerError, "Password is required")
-    }
-
-    /* hash password */
-	password := []byte(passValue)
-	hashedPassword, err := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
-
 	/* store record to db */
-	users := &Users{
+	services := &Services{
 		ID:        primitive.NewObjectID(),
-		Username:  c.FormValue("username"),
-		Password:  string(hashedPassword),
-		Email:     c.FormValue("email"),
+		Title:   c.FormValue("title"),
+		Icon:     c.FormValue("icon"),
+		Desc:      c.FormValue("desc"),
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
-
-	if err := c.Validate(users); err != nil {
-        return err
-    }
 
 	db, err := DB.Connect()
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "Fail to connect DB")
 	}
 
-	_, err = db.Collection(colName).InsertOne(ctx, users)
+	_, err = db.Collection(colName).InsertOne(ctx, services)
 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 
-	return c.JSON(http.StatusOK, utils.NewSuccess(users, "Saved"))
+	return c.JSON(http.StatusOK, utils.NewSuccess(services, "Saved"))
 }
 
-// Update Users godoc
-// @Summary Update an info for page user
-// @Description Update an info for page user
-// @ID update-user
-// @Tags Users
+// Update Services godoc
+// @Summary Update an info for page service
+// @Description Update an info for page service
+// @ID update-service
+// @Tags Services
 // @Accept  json
 // @Produce  json
 // @Security Bearer
-// @Param id path string true "ID of user to get"
-// @Param username body string true "Users username"
-// @Param password body string true "Users password"
-// @Param email body string true "Users email"
-// @Success 200 {object} Users
+// @Param id path string true "ID of service to get"
+// @Param title body string true "Services title"
+// @Param icon body string true "Services icon"
+// @Param desc body string true "Services desc"
+// @Success 200 {object} Services
 // @Failure 400 {object} utils.HttpError
 // @Failure 401 {object} utils.HttpError
-// @Failure 500 {object} utils.HttpError
-// @Router /users/{id} [put]
+// @Router /services/{id} [put]
 func Update(c echo.Context) error {
 	id, err := primitive.ObjectIDFromHex(c.Param("id"))
 
@@ -172,19 +154,11 @@ func Update(c echo.Context) error {
 
 	selector := bson.M{"_id": id}
 
-	/* hash password */
-	password := []byte(c.FormValue("password"))
-	hashedPassword, err := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
-
-	changes := &Users{
-		Username:  c.FormValue("username"),
-		Password:  string(hashedPassword),
-		Email:     c.FormValue("email"),
+	changes := &Services{
+		Title: c.FormValue("title"),
+		Icon:  c.FormValue("icon"),
+		Desc: c.FormValue("desc"),
 	}
-
-	if err := c.Validate(changes); err != nil {
-        return err
-    }
 
 	update, err := db.Collection(colName).UpdateOne(ctx, selector, bson.M{"$set": changes})
 	if err != nil {
@@ -194,18 +168,18 @@ func Update(c echo.Context) error {
 	return c.JSON(http.StatusOK, utils.NewSuccess(update, "Updated"))
 }
 
-// Delete Users godoc
-// @Summary Delete an user info
-// @Description Delete an user info
-// @ID delete-user
-// @Tags Users
+// Delete Services godoc
+// @Summary Delete an service info
+// @Description Delete an service info
+// @ID delete-service
+// @Tags Services
 // @Accept  json
 // @Produce  json
-// @Param id path string true "ID of the user"
-// @Success 200 {object} Users
+// @Param id path string true "ID of the service"
+// @Success 200 {object} Services
 // @Failure 400 {object} utils.HttpError
 // @Failure 401 {object} utils.HttpError
-// @Router /users/{id} [delete]
+// @Router /services/{id} [delete]
 func Destroy(c echo.Context) error {
 	ctx := context.Background()
 	id, err := primitive.ObjectIDFromHex(c.Param("id"))

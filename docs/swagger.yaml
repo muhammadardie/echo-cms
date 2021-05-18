@@ -38,7 +38,184 @@ definitions:
     - image
     - title
     type: object
-  users.Users:
+  carousels.Carousels:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: string
+      image:
+        type: string
+      tagdesc:
+        type: string
+      tagline:
+        type: string
+      updatedAt:
+        type: string
+    required:
+    - image
+    - tagdesc
+    - tagline
+    type: object
+  companies.Companies:
+    properties:
+      createdAt:
+        type: string
+      desc:
+        type: string
+      id:
+        type: string
+      image:
+        type: string
+      title:
+        type: string
+      updatedAt:
+        type: string
+    required:
+    - desc
+    - image
+    - title
+    type: object
+  contacts.Contacts:
+    properties:
+      address:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: string
+      mail:
+        type: string
+      phone:
+        type: string
+      updatedAt:
+        type: string
+    required:
+    - address
+    - mail
+    - phone
+    type: object
+  galleries.Galleries:
+    properties:
+      createdAt:
+        type: string
+      desc:
+        type: string
+      id:
+        type: string
+      image:
+        type: string
+      title:
+        type: string
+      updatedAt:
+        type: string
+      url:
+        type: string
+    required:
+    - desc
+    - image
+    - title
+    - url
+    type: object
+  headers.Headers:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: string
+      image:
+        type: string
+      page:
+        type: string
+      tagdesc:
+        type: string
+      tagline:
+        type: string
+      updatedAt:
+        type: string
+    required:
+    - image
+    - page
+    - tagdesc
+    - tagline
+    type: object
+  services.Services:
+    properties:
+      createdAt:
+        type: string
+      desc:
+        type: string
+      icon:
+        type: string
+      id:
+        type: string
+      title:
+        type: string
+      updatedAt:
+        type: string
+    required:
+    - desc
+    - icon
+    - title
+    type: object
+  socmeds.Socmeds:
+    properties:
+      createdAt:
+        type: string
+      icon:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      updatedAt:
+        type: string
+      url:
+        type: string
+    required:
+    - icon
+    - name
+    - url
+    type: object
+  teams.Teams:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: string
+      image:
+        type: string
+      name:
+        type: string
+      position:
+        type: string
+      updatedAt:
+        type: string
+    required:
+    - image
+    - name
+    - position
+    type: object
+  testimonies.Testimonies:
+    properties:
+      avatar:
+        type: string
+      comment:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: string
+      updatedAt:
+        type: string
+      username:
+        type: string
+    required:
+    - avatar
+    - comment
+    - username
+    type: object
+  users.UserLogin:
     properties:
       email:
         type: string
@@ -47,6 +224,13 @@ definitions:
     required:
     - email
     - password
+    type: object
+  users.Users:
+    properties:
+      email:
+        type: string
+    required:
+    - email
     type: object
   utils.HttpError:
     properties:
@@ -103,6 +287,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
       security:
       - Bearer: []
       summary: Get recent info about
@@ -140,6 +328,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
       security:
       - Bearer: []
       summary: Create an info for page about
@@ -166,6 +358,10 @@ paths:
             $ref: '#/definitions/abouts.Abouts'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/utils.HttpError'
       summary: Delete an about info
@@ -196,6 +392,10 @@ paths:
               type: object
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/utils.HttpError'
       security:
@@ -237,6 +437,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
       security:
       - Bearer: []
       summary: Update an info for page about
@@ -263,6 +467,10 @@ paths:
               type: object
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/utils.HttpError'
       security:
@@ -302,6 +510,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
       security:
       - Bearer: []
       summary: Create blog
@@ -328,6 +540,10 @@ paths:
             $ref: '#/definitions/blogs.Blogs'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/utils.HttpError'
       security:
@@ -360,6 +576,10 @@ paths:
               type: object
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/utils.HttpError'
       security:
@@ -401,11 +621,962 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
       security:
       - Bearer: []
       summary: Update blog
       tags:
       - Blogs
+  /carousels:
+    get:
+      consumes:
+      - application/json
+      operationId: get-carousels
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.HttpSuccess'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/carousels.Carousels'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Get recent carousel
+      tags:
+      - Carousels
+    post:
+      consumes:
+      - multipart/form-data
+      description: Create a carousel content
+      operationId: create-carousels
+      parameters:
+      - description: Blog image
+        in: formData
+        name: image
+        required: true
+        type: file
+      - description: Blog tagline
+        in: formData
+        name: tagline
+        required: true
+        type: string
+      - description: Blog tagdesc
+        in: formData
+        name: tagdesc
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/carousels.Carousels'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Create carousel
+      tags:
+      - Carousels
+  /carousels/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a carousel
+      operationId: delete-carousel
+      parameters:
+      - description: ID of the carousel
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/carousels.Carousels'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Delete a carousel
+      tags:
+      - Carousels
+    get:
+      consumes:
+      - application/json
+      description: Find carousel by ID
+      operationId: find-carousels
+      parameters:
+      - description: ID of the carousel to get
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.HttpSuccess'
+            - properties:
+                data:
+                  $ref: '#/definitions/carousels.Carousels'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Find carousel by ID
+      tags:
+      - Carousels
+    put:
+      consumes:
+      - multipart/form-data
+      description: Update carousel
+      operationId: update-carousel
+      parameters:
+      - description: ID of carousel to get
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Blog image
+        in: formData
+        name: image
+        type: file
+      - description: Blog tagline
+        in: formData
+        name: tagline
+        type: string
+      - description: Blog tagdesc
+        in: formData
+        name: tagdesc
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/carousels.Carousels'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Update carousel
+      tags:
+      - Carousels
+  /companies:
+    get:
+      consumes:
+      - application/json
+      operationId: get-companies
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.HttpSuccess'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/companies.Companies'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Get recent company
+      tags:
+      - Companies
+    post:
+      consumes:
+      - multipart/form-data
+      description: Create a company content
+      operationId: create-companies
+      parameters:
+      - description: Blog image
+        in: formData
+        name: image
+        required: true
+        type: file
+      - description: Blog title
+        in: formData
+        name: title
+        required: true
+        type: string
+      - description: Blog description
+        in: formData
+        name: desc
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/companies.Companies'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Create company
+      tags:
+      - Companies
+  /companies/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a company
+      operationId: delete-company
+      parameters:
+      - description: ID of the company
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/companies.Companies'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Delete a company
+      tags:
+      - Companies
+    get:
+      consumes:
+      - application/json
+      description: Find company by ID
+      operationId: find-companies
+      parameters:
+      - description: ID of the company to get
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.HttpSuccess'
+            - properties:
+                data:
+                  $ref: '#/definitions/companies.Companies'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Find company by ID
+      tags:
+      - Companies
+    put:
+      consumes:
+      - multipart/form-data
+      description: Update company
+      operationId: update-company
+      parameters:
+      - description: ID of company to get
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Blog image
+        in: formData
+        name: image
+        type: file
+      - description: Blog title
+        in: formData
+        name: title
+        type: string
+      - description: Blog description
+        in: formData
+        name: desc
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/companies.Companies'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Update company
+      tags:
+      - Companies
+  /contacts:
+    get:
+      consumes:
+      - application/json
+      description: Get most recent contact
+      operationId: get-contacts
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.HttpSuccess'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/contacts.Contacts'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Get recent contact
+      tags:
+      - Contacts
+    post:
+      consumes:
+      - application/json
+      description: Create an info for page contact
+      operationId: create-contacts
+      parameters:
+      - description: Contacts address
+        in: body
+        name: address
+        required: true
+        schema:
+          type: string
+      - description: Contacts phone
+        in: body
+        name: phone
+        required: true
+        schema:
+          type: string
+      - description: Contacts mail
+        in: body
+        name: mail
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/contacts.Contacts'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Create an info for page contact
+      tags:
+      - Contacts
+  /contacts/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an contact info
+      operationId: delete-contact
+      parameters:
+      - description: ID of the contact
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/contacts.Contacts'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      summary: Delete an contact info
+      tags:
+      - Contacts
+    get:
+      consumes:
+      - application/json
+      description: Find info contacts by ID
+      operationId: find-contacts
+      parameters:
+      - description: ID of the contact to get
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.HttpSuccess'
+            - properties:
+                data:
+                  $ref: '#/definitions/contacts.Contacts'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Find info contacts by ID
+      tags:
+      - Contacts
+    put:
+      consumes:
+      - application/json
+      description: Update an info for page contact
+      operationId: update-contact
+      parameters:
+      - description: ID of contact to get
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Contacts address
+        in: body
+        name: address
+        required: true
+        schema:
+          type: string
+      - description: Contacts phone
+        in: body
+        name: phone
+        required: true
+        schema:
+          type: string
+      - description: Contacts mail
+        in: body
+        name: mail
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/contacts.Contacts'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Update an info for page contact
+      tags:
+      - Contacts
+  /galleries:
+    get:
+      consumes:
+      - application/json
+      description: Get most recent info about
+      operationId: get-galleries
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.HttpSuccess'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/galleries.Galleries'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Get recent info about
+      tags:
+      - Galleries
+    post:
+      consumes:
+      - application/json
+      description: Create a gallery
+      operationId: create-galleries
+      parameters:
+      - description: Galleries image
+        in: formData
+        name: image
+        required: true
+        type: file
+      - description: Galleries url
+        in: formData
+        name: url
+        type: string
+      - description: Galleries title
+        in: formData
+        name: title
+        required: true
+        type: string
+      - description: Galleries description
+        in: formData
+        name: desc
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/galleries.Galleries'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Create a gallery
+      tags:
+      - Galleries
+  /galleries/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a gallery
+      operationId: delete-gallery
+      parameters:
+      - description: ID of the gallery
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/galleries.Galleries'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      summary: Delete a gallery
+      tags:
+      - Galleries
+    get:
+      consumes:
+      - application/json
+      description: Find info galleries by ID
+      operationId: find-galleries
+      parameters:
+      - description: ID of the about to get
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.HttpSuccess'
+            - properties:
+                data:
+                  $ref: '#/definitions/galleries.Galleries'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Find info galleries by ID
+      tags:
+      - Galleries
+    put:
+      consumes:
+      - multipart/form-data
+      description: Update an info for page about
+      operationId: update-about
+      parameters:
+      - description: ID of blog to get
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Galleries image
+        in: formData
+        name: image
+        type: file
+      - description: Galleries url
+        in: formData
+        name: url
+        type: string
+      - description: Galleries title
+        in: formData
+        name: title
+        type: string
+      - description: Galleries description
+        in: formData
+        name: desc
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/galleries.Galleries'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Update an info for page about
+      tags:
+      - Galleries
+  /headers:
+    get:
+      consumes:
+      - application/json
+      operationId: get-headers
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.HttpSuccess'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/headers.Headers'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Get recent header
+      tags:
+      - Headers
+    post:
+      consumes:
+      - multipart/form-data
+      description: Create a header content
+      operationId: create-headers
+      parameters:
+      - description: Header image
+        in: formData
+        name: image
+        required: true
+        type: file
+      - description: Header page
+        in: formData
+        name: page
+        required: true
+        type: string
+      - description: Header tagline
+        in: formData
+        name: tagline
+        required: true
+        type: string
+      - description: Header tagdesc
+        in: formData
+        name: tagdesc
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/headers.Headers'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Create header
+      tags:
+      - Headers
+  /headers/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a header
+      operationId: delete-header
+      parameters:
+      - description: ID of the header
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/headers.Headers'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Delete a header
+      tags:
+      - Headers
+    get:
+      consumes:
+      - application/json
+      description: Find header by ID
+      operationId: find-headers
+      parameters:
+      - description: ID of the header to get
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.HttpSuccess'
+            - properties:
+                data:
+                  $ref: '#/definitions/headers.Headers'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Find header by ID
+      tags:
+      - Headers
+    put:
+      consumes:
+      - multipart/form-data
+      description: Update header
+      operationId: update-header
+      parameters:
+      - description: ID of header to get
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Header image
+        in: formData
+        name: image
+        required: true
+        type: file
+      - description: Header page
+        in: formData
+        name: page
+        required: true
+        type: string
+      - description: Header tagline
+        in: formData
+        name: tagline
+        required: true
+        type: string
+      - description: Header tagdesc
+        in: formData
+        name: tagdesc
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/headers.Headers'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Update header
+      tags:
+      - Headers
   /login:
     post:
       consumes:
@@ -418,7 +1589,7 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/users.Users'
+          $ref: '#/definitions/users.UserLogin'
       produces:
       - application/json
       responses:
@@ -432,9 +1603,15 @@ paths:
                   allOf:
                   - type: string
                   - properties:
+                      _id:
+                        type: string
                       access_token:
                         type: string
+                      email:
+                        type: string
                       refresh_token:
+                        type: string
+                      username:
                         type: string
                     type: object
               type: object
@@ -473,6 +1650,958 @@ paths:
       summary: Logout for existing user
       tags:
       - Auth
+  /services:
+    get:
+      consumes:
+      - application/json
+      description: Get most recent service
+      operationId: get-services
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.HttpSuccess'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/services.Services'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Get recent service
+      tags:
+      - Services
+    post:
+      consumes:
+      - application/json
+      description: Create an info for page service
+      operationId: create-services
+      parameters:
+      - description: Services title
+        in: body
+        name: title
+        required: true
+        schema:
+          type: string
+      - description: Services icon
+        in: body
+        name: icon
+        required: true
+        schema:
+          type: string
+      - description: Services desc
+        in: body
+        name: desc
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/services.Services'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Create an info for page service
+      tags:
+      - Services
+  /services/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an service info
+      operationId: delete-service
+      parameters:
+      - description: ID of the service
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/services.Services'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      summary: Delete an service info
+      tags:
+      - Services
+    get:
+      consumes:
+      - application/json
+      description: Find info services by ID
+      operationId: find-services
+      parameters:
+      - description: ID of the service to get
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.HttpSuccess'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.Services'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Find info services by ID
+      tags:
+      - Services
+    put:
+      consumes:
+      - application/json
+      description: Update an info for page service
+      operationId: update-service
+      parameters:
+      - description: ID of service to get
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Services title
+        in: body
+        name: title
+        required: true
+        schema:
+          type: string
+      - description: Services icon
+        in: body
+        name: icon
+        required: true
+        schema:
+          type: string
+      - description: Services desc
+        in: body
+        name: desc
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/services.Services'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Update an info for page service
+      tags:
+      - Services
+  /socmeds:
+    get:
+      consumes:
+      - application/json
+      description: Get most recent socmeds
+      operationId: get-socmeds
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.HttpSuccess'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/socmeds.Socmeds'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Get recent socmeds
+      tags:
+      - Socmeds
+    post:
+      consumes:
+      - application/json
+      description: Create an info for page socmeds
+      operationId: create-socmeds
+      parameters:
+      - description: Socmeds name
+        in: body
+        name: name
+        required: true
+        schema:
+          type: string
+      - description: Socmeds icon
+        in: body
+        name: icon
+        required: true
+        schema:
+          type: string
+      - description: Socmeds desc
+        in: body
+        name: desc
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/socmeds.Socmeds'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Create an info for page socmeds
+      tags:
+      - Socmeds
+  /socmeds/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an socmeds info
+      operationId: delete-socmeds
+      parameters:
+      - description: ID of the socmeds
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/socmeds.Socmeds'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      summary: Delete an socmeds info
+      tags:
+      - Socmeds
+    get:
+      consumes:
+      - application/json
+      description: Find info socmeds by ID
+      operationId: find-socmeds
+      parameters:
+      - description: ID of the socmeds to get
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.HttpSuccess'
+            - properties:
+                data:
+                  $ref: '#/definitions/socmeds.Socmeds'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Find info socmeds by ID
+      tags:
+      - Socmeds
+    put:
+      consumes:
+      - application/json
+      description: Update an info for page socmeds
+      operationId: update-socmeds
+      parameters:
+      - description: ID of socmeds to get
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Socmeds name
+        in: body
+        name: name
+        required: true
+        schema:
+          type: string
+      - description: Socmeds icon
+        in: body
+        name: icon
+        required: true
+        schema:
+          type: string
+      - description: Socmeds url
+        in: body
+        name: url
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/socmeds.Socmeds'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Update an info for page socmeds
+      tags:
+      - Socmeds
+  /teams:
+    get:
+      consumes:
+      - application/json
+      operationId: get-teams
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.HttpSuccess'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/teams.Teams'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Get recent team
+      tags:
+      - Teams
+    post:
+      consumes:
+      - multipart/form-data
+      description: Create a team content
+      operationId: create-teams
+      parameters:
+      - description: Team image
+        in: formData
+        name: image
+        required: true
+        type: file
+      - description: Team position
+        in: formData
+        name: position
+        required: true
+        type: string
+      - description: Team name
+        in: formData
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/teams.Teams'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Create team
+      tags:
+      - Teams
+  /teams/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a team
+      operationId: delete-team
+      parameters:
+      - description: ID of the team
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/teams.Teams'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Delete a team
+      tags:
+      - Teams
+    get:
+      consumes:
+      - application/json
+      description: Find team by ID
+      operationId: find-teams
+      parameters:
+      - description: ID of the team to get
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.HttpSuccess'
+            - properties:
+                data:
+                  $ref: '#/definitions/teams.Teams'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Find team by ID
+      tags:
+      - Teams
+    put:
+      consumes:
+      - multipart/form-data
+      description: Update team
+      operationId: update-team
+      parameters:
+      - description: ID of team to get
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Team image
+        in: formData
+        name: image
+        type: file
+      - description: Team position
+        in: formData
+        name: position
+        type: string
+      - description: Team name
+        in: formData
+        name: name
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/teams.Teams'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Update team
+      tags:
+      - Teams
+  /testimonies:
+    get:
+      consumes:
+      - application/json
+      operationId: get-testimonies
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.HttpSuccess'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/testimonies.Testimonies'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Get recent testimony
+      tags:
+      - Testimonies
+    post:
+      consumes:
+      - multipart/form-data
+      description: Create a testimony content
+      operationId: create-testimonies
+      parameters:
+      - description: Testimony avatar
+        in: formData
+        name: avatar
+        required: true
+        type: file
+      - description: Testimony comment
+        in: formData
+        name: comment
+        required: true
+        type: string
+      - description: Testimony username
+        in: formData
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/testimonies.Testimonies'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Create testimony
+      tags:
+      - Testimonies
+  /testimonies/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a testimony
+      operationId: delete-testimony
+      parameters:
+      - description: ID of the testimony
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/testimonies.Testimonies'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Delete a testimony
+      tags:
+      - Testimony
+    get:
+      consumes:
+      - application/json
+      description: Find testimony by ID
+      operationId: find-testimonies
+      parameters:
+      - description: ID of the testimony to get
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.HttpSuccess'
+            - properties:
+                data:
+                  $ref: '#/definitions/testimonies.Testimonies'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Find testimony by ID
+      tags:
+      - Testimonies
+    put:
+      consumes:
+      - multipart/form-data
+      description: Update testimony
+      operationId: update-testimony
+      parameters:
+      - description: ID of testimony to get
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Testimony avatar
+        in: formData
+        name: avatar
+        type: file
+      - description: Testimony comment
+        in: formData
+        name: comment
+        type: string
+      - description: Testimony username
+        in: formData
+        name: username
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/testimonies.Testimonies'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Update testimony
+      tags:
+      - Testimony
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: Get most recent user
+      operationId: get-users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.HttpSuccess'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/users.Users'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Get recent user
+      tags:
+      - Users
+    post:
+      consumes:
+      - application/json
+      description: Create an info for page user
+      operationId: create-users
+      parameters:
+      - description: Users username
+        in: body
+        name: username
+        required: true
+        schema:
+          type: string
+      - description: Users password
+        in: body
+        name: password
+        required: true
+        schema:
+          type: string
+      - description: Users email
+        in: body
+        name: email
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/users.Users'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Create an info for page user
+      tags:
+      - Users
+  /users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an user info
+      operationId: delete-user
+      parameters:
+      - description: ID of the user
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/users.Users'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      summary: Delete an user info
+      tags:
+      - Users
+    get:
+      consumes:
+      - application/json
+      description: Find info users by ID
+      operationId: find-users
+      parameters:
+      - description: ID of the user to get
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.HttpSuccess'
+            - properties:
+                data:
+                  $ref: '#/definitions/users.Users'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Find info users by ID
+      tags:
+      - Users
+    put:
+      consumes:
+      - application/json
+      description: Update an info for page user
+      operationId: update-user
+      parameters:
+      - description: ID of user to get
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Users username
+        in: body
+        name: username
+        required: true
+        schema:
+          type: string
+      - description: Users password
+        in: body
+        name: password
+        required: true
+        schema:
+          type: string
+      - description: Users email
+        in: body
+        name: email
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/users.Users'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HttpError'
+      security:
+      - Bearer: []
+      summary: Update an info for page user
+      tags:
+      - Users
 schemes:
 - http
 - https

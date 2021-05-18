@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"context"
 	"github.com/labstack/echo/v4"
 	"github.com/muhammadardie/echo-cms/components/users"
@@ -14,6 +15,14 @@ import (
 
 var ctx = context.Background()
 
+type Token struct {
+	ID            primitive.ObjectID 	`json:"_id"`
+	Username      string   				`json:"username"`
+	Email     	  string   				`json:"email"`
+	AccessToken   string   				`json:"access_token"`
+	RefreshToken  string   				`json:"refresh_token"`
+}
+
 // Login godoc
 // @Summary Login for existing user
 // @Description Login for existing user
@@ -21,15 +30,15 @@ var ctx = context.Background()
 // @Tags Auth
 // @Accept  json
 // @Produce  json
-// @Param user body users.Users true "Credentials to use"
-// @Success 200 {object} utils.HttpSuccess{data=string{access_token=string,refresh_token=string}}
+// @Param user body users.UserLogin true "Credentials to use"
+// @Success 200 {object} utils.HttpSuccess{data=string{_id=string,username=string,email=string,access_token=string,refresh_token=string}}
 // @Failure 400 {object} utils.HttpError
 // @Failure 401 {object} utils.HttpError
 // @Failure 500 {object} utils.HttpError
 // @Router /login [post]
 func Login(c echo.Context) error {
 	ctx := context.Background()
-	user := new(users.Users)
+	user := new(users.UserLogin)
 
 	if err := c.Bind(user); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
@@ -71,9 +80,12 @@ func Login(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnprocessableEntity, err.Error())
 	}
 
-	tokens := map[string]string{
-		"access_token":  ts.AccessToken,
-		"refresh_token": ts.RefreshToken,
+	tokens := &Token{
+		ID: dbUser.ID,
+		Username: dbUser.Username,
+		Email: dbUser.Email,
+		AccessToken:  ts.AccessToken,
+		RefreshToken: ts.RefreshToken,
 	}
 
 	return c.JSON(http.StatusOK, utils.NewSuccess(tokens, "Successfully logged in"))

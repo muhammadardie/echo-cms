@@ -1,4 +1,4 @@
-package abouts
+package testimonies
 
 import (
 	"context"
@@ -17,20 +17,20 @@ import (
 
 var ctx = context.Background()
 
-const colName = "abouts"
+const colName = "testimonies"
 
-// Get Abouts godoc
-// @Summary Get recent info about
-// @Description Get most recent info about
-// @ID get-abouts
-// @Tags Abouts
+// Get Testimony godoc
+// @Summary Get recent testimony
+// @Contentription get most recent testimony
+// @ID get-testimonies
+// @Tags Testimonies
 // @Accept  json
 // @Produce  json
 // @Security Bearer
-// @Success 200 {object} utils.HttpSuccess{data=[]Abouts}
+// @Success 200 {object} utils.HttpSuccess{data=[]Testimonies}
 // @Failure 400 {object} utils.HttpError
 // @Failure 401 {object} utils.HttpError
-// @Router /abouts [get]
+// @Router /testimonies [get]
 func Get(c echo.Context) error {
 	db, err := DB.Connect()
 	if err != nil {
@@ -44,7 +44,7 @@ func Get(c echo.Context) error {
 
 	defer csr.Close(ctx)
 
-	result := make([]Abouts, 0)
+	result := make([]Testimonies, 0)
 	if err = csr.All(ctx, &result); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
@@ -52,19 +52,19 @@ func Get(c echo.Context) error {
 	return c.JSON(http.StatusOK, utils.NewSuccess(result, ""))
 }
 
-// Find Abouts godoc
-// @Summary Find info abouts by ID
-// @Description Find info abouts by ID
-// @ID find-abouts
-// @Tags Abouts
+// Find Testimony godoc
+// @Summary Find testimony by ID
+// @Description Find testimony by ID
+// @ID find-testimonies
+// @Tags Testimonies
 // @Accept  json
 // @Produce  json
 // @Security Bearer
-// @Param id path string true "ID of the about to get"
-// @Success 200 {object} utils.HttpSuccess{data=Abouts}
+// @Param id path string true "ID of the testimony to get"
+// @Success 200 {object} utils.HttpSuccess{data=Testimonies}
 // @Failure 400 {object} utils.HttpError
 // @Failure 401 {object} utils.HttpError
-// @Router /abouts/{id} [get]
+// @Router /testimonies/{id} [get]
 func Find(c echo.Context) error {
 	id, err := primitive.ObjectIDFromHex(c.Param("id"))
 
@@ -79,7 +79,7 @@ func Find(c echo.Context) error {
 
 	selector := bson.M{"_id": id}
 
-	var record Abouts
+	var record Testimonies
 
 	if err = db.Collection(colName).FindOne(ctx, selector).Decode(&record); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
@@ -88,24 +88,24 @@ func Find(c echo.Context) error {
 	return c.JSON(http.StatusOK, utils.NewSuccess(record, ""))
 }
 
-// Create About godoc
-// @Summary Create an info for page about
-// @Description Create an info for page about
-// @ID create-abouts
-// @Tags Abouts
+// Create Testimony godoc
+// @Summary Create testimony
+// @Description Create a testimony content
+// @ID create-testimonies
+// @Tags Testimonies
 // @Accept  mpfd
 // @Produce  json
 // @Security Bearer
-// @Param image formData file true "Abouts image"
-// @Param title formData string true "Abouts title"
-// @Param desc formData string true "Abouts description"
-// @Success 200 {object} Abouts
+// @Param avatar formData file true "Testimony avatar"
+// @Param comment formData string true "Testimony comment"
+// @Param username formData string true "Testimony username"
+// @Success 200 {object} Testimonies
 // @Failure 400 {object} utils.HttpError
 // @Failure 401 {object} utils.HttpError
-// @Router /abouts [post]
+// @Router /testimonies [post]
 func Create(c echo.Context) error {
 	/* upload image first */
-	file, err := c.FormFile("image")
+	file, err := c.FormFile("avatar")
 	if err != nil {
 		return err
 	}
@@ -122,7 +122,7 @@ func Create(c echo.Context) error {
 	defer src.Close()
 
 	// Destination
-	path := "./uploaded_files/about/"
+	path := "./uploaded_files/testimony/"
 	name := file.Filename
 	extension := filepath.Ext(name)
 	filename := xid.New().String() + extension
@@ -137,43 +137,43 @@ func Create(c echo.Context) error {
 	if _, err = io.Copy(dst, src); err != nil {
 		return err
 	}
-	// end upload image
+	/* end upload image */
 
 	/* store record to db */
-	abouts := &Abouts{
+	testimoniesRecord := &Testimonies{
 		ID:        primitive.NewObjectID(),
-		Title:     c.FormValue("title"),
-		Desc:      c.FormValue("desc"),
-		Image:     filename,
+		Username:  c.FormValue("username"),
+		Comment:   c.FormValue("comment"),
+		Avatar:     filename,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
 
-	_, err = db.Collection(colName).InsertOne(ctx, abouts)
+	_, err = db.Collection(colName).InsertOne(ctx, testimoniesRecord)
 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 
-	return c.JSON(http.StatusOK, utils.NewSuccess(abouts, "Saved"))
+	return c.JSON(http.StatusOK, utils.NewSuccess(testimoniesRecord, "Saved"))
 }
 
-// Update About godoc
-// @Summary Update an info for page about
-// @Description Update an info for page about
-// @ID update-about
-// @Tags Abouts
+// Update Testimony godoc
+// @Summary Update testimony
+// @Description Update testimony
+// @ID update-testimony
+// @Tags Testimony
 // @Accept  mpfd
 // @Produce  json
 // @Security Bearer
-// @Param id path string true "ID of blog to get"
-// @Param image formData file false "Abouts image"
-// @Param title formData string false "Abouts title"
-// @Param desc formData string false "Abouts description"
-// @Success 200 {object} Abouts
+// @Param id path string true "ID of testimony to get"
+// @Param avatar formData file false "Testimony avatar"
+// @Param comment formData string false "Testimony comment"
+// @Param username formData string false "Testimony username"
+// @Success 200 {object} Testimonies
 // @Failure 400 {object} utils.HttpError
 // @Failure 401 {object} utils.HttpError
-// @Router /abouts/{id} [put]
+// @Router /testimonies/{id} [put]
 func Update(c echo.Context) error {
 	id, err := primitive.ObjectIDFromHex(c.Param("id"))
 
@@ -188,26 +188,26 @@ func Update(c echo.Context) error {
 
 	selector := bson.M{"_id": id}
 
-	changes := &Abouts{
-		Title: c.FormValue("title"),
-		Desc:  c.FormValue("desc"),
-		Image: "",
+	changes := &Testimonies{
+		Username:   c.FormValue("username"),
+		Comment: c.FormValue("comment"),
+		Avatar:   "",
 	}
 
 	/* check image exist first */
-	file, err := c.FormFile("image")
+	file, err := c.FormFile("avatar")
 	// if no error then there is valid image request
 	if err == nil {
 		/* delete existing file if exist */
-		path := "./uploaded_files/about/"
-		var record Abouts
+		path := "./uploaded_files/testimony/"
+		var record Testimonies
 
 		if err = db.Collection(colName).FindOne(ctx, selector).Decode(&record); err != nil {
 			return echo.NewHTTPError(http.StatusBadRequest, err)
 		}
 
-		if record.Image != "" {
-			err := os.Remove(path + record.Image)
+		if record.Avatar != "" {
+			err := os.Remove(path + record.Avatar)
 
 			if err != nil {
 				return echo.NewHTTPError(http.StatusBadRequest, err)
@@ -237,7 +237,7 @@ func Update(c echo.Context) error {
 			return err
 		}
 
-		changes.Image = filename
+		changes.Avatar = filename
 	}
 
 	update, err := db.Collection(colName).UpdateOne(ctx, selector, bson.M{"$set": changes})
@@ -246,22 +246,23 @@ func Update(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, utils.NewSuccess(update, "Updated"))
+
 }
 
-// Delete Abouts godoc
-// @Summary Delete an about info
-// @Description Delete an about info
-// @ID delete-about
-// @Tags Abouts
+// Delete Testimony godoc
+// @Summary Delete a testimony
+// @Description Delete a testimony
+// @ID delete-testimony
+// @Tags Testimony
 // @Accept  json
 // @Produce  json
-// @Param id path string true "ID of the about"
-// @Success 200 {object} Abouts
+// @Security Bearer
+// @Param id path string true "ID of the testimony"
+// @Success 200 {object} Testimonies
 // @Failure 400 {object} utils.HttpError
 // @Failure 401 {object} utils.HttpError
-// @Router /abouts/{id} [delete]
+// @Router /testimonies/{id} [delete]
 func Destroy(c echo.Context) error {
-	ctx := context.Background()
 	id, err := primitive.ObjectIDFromHex(c.Param("id"))
 
 	if err != nil {
@@ -276,15 +277,15 @@ func Destroy(c echo.Context) error {
 	selector := bson.M{"_id": id}
 
 	/* delete any exist image */
-	path := "./uploaded_files/about/"
-	var record Abouts
+	path := "./uploaded_files/testimony/"
+	var record Testimonies
 
 	if err = db.Collection(colName).FindOne(ctx, selector).Decode(&record); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 
-	if record.Image != "" {
-		err := os.Remove(path + record.Image)
+	if record.Avatar != "" {
+		err := os.Remove(path + record.Avatar)
 
 		if err != nil {
 			return echo.NewHTTPError(http.StatusBadRequest, err)

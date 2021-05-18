@@ -1,4 +1,4 @@
-package abouts
+package galleries
 
 import (
 	"context"
@@ -17,20 +17,20 @@ import (
 
 var ctx = context.Background()
 
-const colName = "abouts"
+const colName = "galleries"
 
-// Get Abouts godoc
+// Get Galleries godoc
 // @Summary Get recent info about
 // @Description Get most recent info about
-// @ID get-abouts
-// @Tags Abouts
+// @ID get-galleries
+// @Tags Galleries
 // @Accept  json
 // @Produce  json
 // @Security Bearer
-// @Success 200 {object} utils.HttpSuccess{data=[]Abouts}
+// @Success 200 {object} utils.HttpSuccess{data=[]Galleries}
 // @Failure 400 {object} utils.HttpError
 // @Failure 401 {object} utils.HttpError
-// @Router /abouts [get]
+// @Router /galleries [get]
 func Get(c echo.Context) error {
 	db, err := DB.Connect()
 	if err != nil {
@@ -44,7 +44,7 @@ func Get(c echo.Context) error {
 
 	defer csr.Close(ctx)
 
-	result := make([]Abouts, 0)
+	result := make([]Galleries, 0)
 	if err = csr.All(ctx, &result); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
@@ -52,19 +52,19 @@ func Get(c echo.Context) error {
 	return c.JSON(http.StatusOK, utils.NewSuccess(result, ""))
 }
 
-// Find Abouts godoc
-// @Summary Find info abouts by ID
-// @Description Find info abouts by ID
-// @ID find-abouts
-// @Tags Abouts
+// Find Galleries godoc
+// @Summary Find info galleries by ID
+// @Description Find info galleries by ID
+// @ID find-galleries
+// @Tags Galleries
 // @Accept  json
 // @Produce  json
 // @Security Bearer
 // @Param id path string true "ID of the about to get"
-// @Success 200 {object} utils.HttpSuccess{data=Abouts}
+// @Success 200 {object} utils.HttpSuccess{data=Galleries}
 // @Failure 400 {object} utils.HttpError
 // @Failure 401 {object} utils.HttpError
-// @Router /abouts/{id} [get]
+// @Router /galleries/{id} [get]
 func Find(c echo.Context) error {
 	id, err := primitive.ObjectIDFromHex(c.Param("id"))
 
@@ -79,7 +79,7 @@ func Find(c echo.Context) error {
 
 	selector := bson.M{"_id": id}
 
-	var record Abouts
+	var record Galleries
 
 	if err = db.Collection(colName).FindOne(ctx, selector).Decode(&record); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
@@ -88,21 +88,22 @@ func Find(c echo.Context) error {
 	return c.JSON(http.StatusOK, utils.NewSuccess(record, ""))
 }
 
-// Create About godoc
-// @Summary Create an info for page about
-// @Description Create an info for page about
-// @ID create-abouts
-// @Tags Abouts
-// @Accept  mpfd
+// Create Gallery godoc
+// @Summary Create a gallery
+// @Description Create a gallery
+// @ID create-galleries
+// @Tags Galleries
+// @Accept  json
 // @Produce  json
 // @Security Bearer
-// @Param image formData file true "Abouts image"
-// @Param title formData string true "Abouts title"
-// @Param desc formData string true "Abouts description"
-// @Success 200 {object} Abouts
+// @Param image formData file true "Galleries image"
+// @Param url formData string false "Galleries url"
+// @Param title formData string true "Galleries title"
+// @Param desc formData string false "Galleries description"
+// @Success 200 {object} Galleries
 // @Failure 400 {object} utils.HttpError
 // @Failure 401 {object} utils.HttpError
-// @Router /abouts [post]
+// @Router /galleries [post]
 func Create(c echo.Context) error {
 	/* upload image first */
 	file, err := c.FormFile("image")
@@ -122,7 +123,7 @@ func Create(c echo.Context) error {
 	defer src.Close()
 
 	// Destination
-	path := "./uploaded_files/about/"
+	path := "./uploaded_files/gallery/"
 	name := file.Filename
 	extension := filepath.Ext(name)
 	filename := xid.New().String() + extension
@@ -140,40 +141,42 @@ func Create(c echo.Context) error {
 	// end upload image
 
 	/* store record to db */
-	abouts := &Abouts{
+	galleries := &Galleries{
 		ID:        primitive.NewObjectID(),
 		Title:     c.FormValue("title"),
+		Url:       c.FormValue("url"),
 		Desc:      c.FormValue("desc"),
-		Image:     filename,
+		Image:     filename,	
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
 
-	_, err = db.Collection(colName).InsertOne(ctx, abouts)
+	_, err = db.Collection(colName).InsertOne(ctx, galleries)
 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 
-	return c.JSON(http.StatusOK, utils.NewSuccess(abouts, "Saved"))
+	return c.JSON(http.StatusOK, utils.NewSuccess(galleries, "Saved"))
 }
 
 // Update About godoc
 // @Summary Update an info for page about
 // @Description Update an info for page about
 // @ID update-about
-// @Tags Abouts
+// @Tags Galleries
 // @Accept  mpfd
 // @Produce  json
 // @Security Bearer
 // @Param id path string true "ID of blog to get"
-// @Param image formData file false "Abouts image"
-// @Param title formData string false "Abouts title"
-// @Param desc formData string false "Abouts description"
-// @Success 200 {object} Abouts
+// @Param image formData file false "Galleries image"
+// @Param url formData string false "Galleries url"
+// @Param title formData string false "Galleries title"
+// @Param desc formData string false "Galleries description"
+// @Success 200 {object} Galleries
 // @Failure 400 {object} utils.HttpError
 // @Failure 401 {object} utils.HttpError
-// @Router /abouts/{id} [put]
+// @Router /galleries/{id} [put]
 func Update(c echo.Context) error {
 	id, err := primitive.ObjectIDFromHex(c.Param("id"))
 
@@ -188,8 +191,9 @@ func Update(c echo.Context) error {
 
 	selector := bson.M{"_id": id}
 
-	changes := &Abouts{
+	changes := &Galleries{
 		Title: c.FormValue("title"),
+		Url:  c.FormValue("url"),
 		Desc:  c.FormValue("desc"),
 		Image: "",
 	}
@@ -199,8 +203,8 @@ func Update(c echo.Context) error {
 	// if no error then there is valid image request
 	if err == nil {
 		/* delete existing file if exist */
-		path := "./uploaded_files/about/"
-		var record Abouts
+		path := "./uploaded_files/gallery/"
+		var record Galleries
 
 		if err = db.Collection(colName).FindOne(ctx, selector).Decode(&record); err != nil {
 			return echo.NewHTTPError(http.StatusBadRequest, err)
@@ -248,18 +252,18 @@ func Update(c echo.Context) error {
 	return c.JSON(http.StatusOK, utils.NewSuccess(update, "Updated"))
 }
 
-// Delete Abouts godoc
-// @Summary Delete an about info
-// @Description Delete an about info
-// @ID delete-about
-// @Tags Abouts
+// Delete Gallerie godoc
+// @Summary Delete a gallery
+// @Description Delete a gallery
+// @ID delete-gallery
+// @Tags Galleries
 // @Accept  json
 // @Produce  json
-// @Param id path string true "ID of the about"
-// @Success 200 {object} Abouts
+// @Param id path string true "ID of the gallery"
+// @Success 200 {object} Galleries
 // @Failure 400 {object} utils.HttpError
 // @Failure 401 {object} utils.HttpError
-// @Router /abouts/{id} [delete]
+// @Router /galleries/{id} [delete]
 func Destroy(c echo.Context) error {
 	ctx := context.Background()
 	id, err := primitive.ObjectIDFromHex(c.Param("id"))
@@ -276,8 +280,8 @@ func Destroy(c echo.Context) error {
 	selector := bson.M{"_id": id}
 
 	/* delete any exist image */
-	path := "./uploaded_files/about/"
-	var record Abouts
+	path := "./uploaded_files/gallery/"
+	var record Galleries
 
 	if err = db.Collection(colName).FindOne(ctx, selector).Decode(&record); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err)

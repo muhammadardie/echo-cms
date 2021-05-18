@@ -29,6 +29,7 @@ const colName = "blogs"
 // @Security Bearer
 // @Success 200 {object} utils.HttpSuccess{data=[]Blogs}
 // @Failure 400 {object} utils.HttpError
+// @Failure 401 {object} utils.HttpError
 // @Router /blogs [get]
 func Get(c echo.Context) error {
 	db, err := DB.Connect()
@@ -62,6 +63,7 @@ func Get(c echo.Context) error {
 // @Param id path string true "ID of the blog to get"
 // @Success 200 {object} utils.HttpSuccess{data=Blogs}
 // @Failure 400 {object} utils.HttpError
+// @Failure 401 {object} utils.HttpError
 // @Router /blogs/{id} [get]
 func Find(c echo.Context) error {
 	id, err := primitive.ObjectIDFromHex(c.Param("id"))
@@ -99,6 +101,7 @@ func Find(c echo.Context) error {
 // @Param content formData string true "Blog content"
 // @Success 200 {object} Blogs
 // @Failure 400 {object} utils.HttpError
+// @Failure 401 {object} utils.HttpError
 // @Router /blogs [post]
 func Create(c echo.Context) error {
 	/* upload image first */
@@ -169,6 +172,7 @@ func Create(c echo.Context) error {
 // @Param content formData string false "Blog content"
 // @Success 200 {object} Blogs
 // @Failure 400 {object} utils.HttpError
+// @Failure 401 {object} utils.HttpError
 // @Router /blogs/{id} [put]
 func Update(c echo.Context) error {
 	id, err := primitive.ObjectIDFromHex(c.Param("id"))
@@ -256,6 +260,7 @@ func Update(c echo.Context) error {
 // @Param id path string true "ID of the blog"
 // @Success 200 {object} Blogs
 // @Failure 400 {object} utils.HttpError
+// @Failure 401 {object} utils.HttpError
 // @Router /blogs/{id} [delete]
 func Destroy(c echo.Context) error {
 	id, err := primitive.ObjectIDFromHex(c.Param("id"))
