@@ -1,5 +1,6 @@
 module github.com/muhammadardie/echo-cms
 
+// +heroku goVersion go1.15
 go 1.15
 
 require (
