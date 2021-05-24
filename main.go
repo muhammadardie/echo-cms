@@ -7,6 +7,7 @@ import (
 	"github.com/muhammadardie/echo-cms/middleware"
 	"github.com/muhammadardie/echo-cms/routes"
 	echoSwagger "github.com/swaggo/echo-swagger" // echo-swagger middleware
+	"os"
 )
 
 // @title Swagger Example API
@@ -43,5 +44,5 @@ func main() {
 
 	routes.Register(g)
 
-	r.Logger.Fatal(r.Start(":8080"))
+	r.Logger.Fatal(r.Start(":" + os.Getenv("PORT")))
 }
