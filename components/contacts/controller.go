@@ -156,8 +156,8 @@ func Update(c echo.Context) error {
 
 	changes := &Contacts{
 		Address: c.FormValue("address"),
-		Phone:  c.FormValue("phone"),
-		Mail: c.FormValue("mail"),
+		Phone:   c.FormValue("phone"),
+		Mail:    c.FormValue("mail"),
 	}
 
 	update, err := db.Collection(colName).UpdateOne(ctx, selector, bson.M{"$set": changes})

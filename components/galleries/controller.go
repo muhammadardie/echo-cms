@@ -146,7 +146,7 @@ func Create(c echo.Context) error {
 		Title:     c.FormValue("title"),
 		Url:       c.FormValue("url"),
 		Desc:      c.FormValue("desc"),
-		Image:     filename,	
+		Image:     filename,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
@@ -193,7 +193,7 @@ func Update(c echo.Context) error {
 
 	changes := &Galleries{
 		Title: c.FormValue("title"),
-		Url:  c.FormValue("url"),
+		Url:   c.FormValue("url"),
 		Desc:  c.FormValue("desc"),
 		Image: "",
 	}

@@ -142,7 +142,7 @@ func Create(c echo.Context) error {
 	/* store record to db */
 	carouselsRecord := &Carousels{
 		ID:        primitive.NewObjectID(),
-		Tagline:     c.FormValue("tagline"),
+		Tagline:   c.FormValue("tagline"),
 		Tagdesc:   c.FormValue("tagdesc"),
 		Image:     filename,
 		CreatedAt: time.Now(),
@@ -189,7 +189,7 @@ func Update(c echo.Context) error {
 	selector := bson.M{"_id": id}
 
 	changes := &Carousels{
-		Tagline:   c.FormValue("tagline"),
+		Tagline: c.FormValue("tagline"),
 		Tagdesc: c.FormValue("tagdesc"),
 		Image:   "",
 	}

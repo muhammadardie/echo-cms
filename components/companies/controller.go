@@ -141,12 +141,12 @@ func Create(c echo.Context) error {
 
 	/* store record to db */
 	companiesRecord := &Companies{
-		ID:        		primitive.NewObjectID(),
-		Title:     		c.FormValue("title"),
-		Desc:			c.FormValue("desc"),
-		Image:     		filename,
-		CreatedAt: 		time.Now(),
-		UpdatedAt: 		time.Now(),
+		ID:        primitive.NewObjectID(),
+		Title:     c.FormValue("title"),
+		Desc:      c.FormValue("desc"),
+		Image:     filename,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 
 	_, err = db.Collection(colName).InsertOne(ctx, companiesRecord)
@@ -189,9 +189,9 @@ func Update(c echo.Context) error {
 	selector := bson.M{"_id": id}
 
 	changes := &Companies{
-		Title:   c.FormValue("title"),
-		Desc: 	 c.FormValue("desc"),
-		Image:   "",
+		Title: c.FormValue("title"),
+		Desc:  c.FormValue("desc"),
+		Image: "",
 	}
 
 	/* check image exist first */

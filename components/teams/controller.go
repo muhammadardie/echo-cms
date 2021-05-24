@@ -189,9 +189,9 @@ func Update(c echo.Context) error {
 	selector := bson.M{"_id": id}
 
 	changes := &Teams{
-		Name:   c.FormValue("name"),
+		Name:     c.FormValue("name"),
 		Position: c.FormValue("position"),
-		Image:   "",
+		Image:    "",
 	}
 
 	/* check image exist first */

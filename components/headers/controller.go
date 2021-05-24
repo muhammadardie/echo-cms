@@ -143,7 +143,7 @@ func Create(c echo.Context) error {
 	/* store record to db */
 	headersRecord := &Headers{
 		ID:        primitive.NewObjectID(),
-		Page:     c.FormValue("page"),
+		Page:      c.FormValue("page"),
 		Tagline:   c.FormValue("tagline"),
 		Tagdesc:   c.FormValue("tagdesc"),
 		Image:     filename,
@@ -192,10 +192,10 @@ func Update(c echo.Context) error {
 	selector := bson.M{"_id": id}
 
 	changes := &Headers{
-		Page:      c.FormValue("page"),
-		Tagline:   c.FormValue("tagline"),
-		Tagdesc:   c.FormValue("tagdesc"),
-		Image:     "",
+		Page:    c.FormValue("page"),
+		Tagline: c.FormValue("tagline"),
+		Tagdesc: c.FormValue("tagdesc"),
+		Image:   "",
 	}
 
 	/* check image exist first */

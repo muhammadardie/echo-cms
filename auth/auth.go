@@ -1,13 +1,13 @@
 package auth
 
 import (
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"context"
 	"github.com/labstack/echo/v4"
 	"github.com/muhammadardie/echo-cms/components/users"
 	DB "github.com/muhammadardie/echo-cms/db"
 	"github.com/muhammadardie/echo-cms/utils"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"time"
@@ -16,11 +16,11 @@ import (
 var ctx = context.Background()
 
 type Token struct {
-	ID            primitive.ObjectID 	`json:"_id"`
-	Username      string   				`json:"username"`
-	Email     	  string   				`json:"email"`
-	AccessToken   string   				`json:"access_token"`
-	RefreshToken  string   				`json:"refresh_token"`
+	ID           primitive.ObjectID `json:"_id"`
+	Username     string             `json:"username"`
+	Email        string             `json:"email"`
+	AccessToken  string             `json:"access_token"`
+	RefreshToken string             `json:"refresh_token"`
 }
 
 // Login godoc
@@ -81,9 +81,9 @@ func Login(c echo.Context) error {
 	}
 
 	tokens := &Token{
-		ID: dbUser.ID,
-		Username: dbUser.Username,
-		Email: dbUser.Email,
+		ID:           dbUser.ID,
+		Username:     dbUser.Username,
+		Email:        dbUser.Email,
 		AccessToken:  ts.AccessToken,
 		RefreshToken: ts.RefreshToken,
 	}

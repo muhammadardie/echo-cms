@@ -106,10 +106,10 @@ func Create(c echo.Context) error {
 	/* check password */
 	passValue := c.FormValue("password")
 	if passValue == "" {
-        return echo.NewHTTPError(http.StatusInternalServerError, "Password is required")
-    }
+		return echo.NewHTTPError(http.StatusInternalServerError, "Password is required")
+	}
 
-    /* hash password */
+	/* hash password */
 	password := []byte(passValue)
 	hashedPassword, err := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
 
@@ -124,8 +124,8 @@ func Create(c echo.Context) error {
 	}
 
 	if err := c.Validate(users); err != nil {
-        return err
-    }
+		return err
+	}
 
 	db, err := DB.Connect()
 	if err != nil {
@@ -177,14 +177,14 @@ func Update(c echo.Context) error {
 	hashedPassword, err := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
 
 	changes := &Users{
-		Username:  c.FormValue("username"),
-		Password:  string(hashedPassword),
-		Email:     c.FormValue("email"),
+		Username: c.FormValue("username"),
+		Password: string(hashedPassword),
+		Email:    c.FormValue("email"),
 	}
 
 	if err := c.Validate(changes); err != nil {
-        return err
-    }
+		return err
+	}
 
 	update, err := db.Collection(colName).UpdateOne(ctx, selector, bson.M{"$set": changes})
 	if err != nil {

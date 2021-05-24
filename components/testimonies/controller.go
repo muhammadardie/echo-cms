@@ -144,7 +144,7 @@ func Create(c echo.Context) error {
 		ID:        primitive.NewObjectID(),
 		Username:  c.FormValue("username"),
 		Comment:   c.FormValue("comment"),
-		Avatar:     filename,
+		Avatar:    filename,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
@@ -189,8 +189,8 @@ func Update(c echo.Context) error {
 	selector := bson.M{"_id": id}
 
 	changes := &Testimonies{
-		Username:   c.FormValue("username"),
-		Comment: c.FormValue("comment"),
+		Username: c.FormValue("username"),
+		Comment:  c.FormValue("comment"),
 		Avatar:   "",
 	}
 

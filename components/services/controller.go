@@ -103,8 +103,8 @@ func Create(c echo.Context) error {
 	/* store record to db */
 	services := &Services{
 		ID:        primitive.NewObjectID(),
-		Title:   c.FormValue("title"),
-		Icon:     c.FormValue("icon"),
+		Title:     c.FormValue("title"),
+		Icon:      c.FormValue("icon"),
 		Desc:      c.FormValue("desc"),
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
@@ -157,7 +157,7 @@ func Update(c echo.Context) error {
 	changes := &Services{
 		Title: c.FormValue("title"),
 		Icon:  c.FormValue("icon"),
-		Desc: c.FormValue("desc"),
+		Desc:  c.FormValue("desc"),
 	}
 
 	update, err := db.Collection(colName).UpdateOne(ctx, selector, bson.M{"$set": changes})
