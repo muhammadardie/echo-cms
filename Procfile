@@ -1,1 +1,1 @@
-web: currency
+web: echo-cms
