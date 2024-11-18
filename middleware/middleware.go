@@ -2,13 +2,15 @@ package middleware
 
 import (
 	"fmt"
+	"net/http"
+	"os"
+
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
 	"github.com/muhammadardie/echo-cms/auth"
 	"github.com/muhammadardie/echo-cms/utils"
-	"net/http"
 )
 
 type CustomValidator struct {
@@ -19,7 +21,27 @@ func New() *echo.Echo {
 	e := echo.New()
 	e.Validator = &CustomValidator{validator: validator.New()}
 	e.HTTPErrorHandler = ErrorHandler
-	e.Logger.SetLevel(log.DEBUG)
+
+	logLevel := os.Getenv("LOG_LEVEL")
+	if logLevel == "" {
+		logLevel = string(log.ERROR) // Default to ERROR level if not set
+	}
+
+	// Set the log level based on the environment variable
+	switch logLevel {
+	case "DEBUG":
+		e.Logger.SetLevel(log.DEBUG)
+	case "INFO":
+		e.Logger.SetLevel(log.INFO)
+	case "WARN":
+		e.Logger.SetLevel(log.WARN)
+	case "ERROR":
+		e.Logger.SetLevel(log.ERROR)
+	default:
+		e.Logger.SetLevel(log.ERROR) // Default to ERROR if invalid value
+	}
+
+	e.Logger.SetLevel(log.ERROR)
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.Logger())
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{

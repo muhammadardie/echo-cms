@@ -29,5 +29,6 @@ RESTful API service for cms application using [Echo framework](https://echo.labs
 | REDIS_PASSWORD   | Redis Password                 	 |
 
 ## Demo
-APP: https://echo-cms-app.herokuapp.com
-API Documentation: https://echo-cms-app.herokuapp.com/swagger/index.html
+
+- **APP**: [https://echo-cms.muhammadardie.tech](https://echo-cms.muhammadardie.tech)
+- **Documentation**: [https://echo-cms.muhammadardie.tech/swagger/index.html](https://echo-cms.muhammadardie.tech/swagger/index.html)
