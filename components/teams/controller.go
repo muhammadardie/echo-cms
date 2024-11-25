@@ -2,17 +2,18 @@ package teams
 
 import (
 	"context"
+	"io"
+	"net/http"
+	"os"
+	"path/filepath"
+	"time"
+
 	"github.com/labstack/echo/v4"
 	DB "github.com/muhammadardie/echo-cms/db"
 	"github.com/muhammadardie/echo-cms/utils"
 	"github.com/rs/xid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"io"
-	"net/http"
-	"os"
-	"path/filepath"
-	"time"
 )
 
 var ctx = context.Background()
@@ -207,10 +208,15 @@ func Update(c echo.Context) error {
 		}
 
 		if record.Image != "" {
-			err := os.Remove(path + record.Image)
+			filePath := path + record.Image
 
-			if err != nil {
-				return echo.NewHTTPError(http.StatusBadRequest, err)
+			// Check if the file exists
+			if _, err := os.Stat(filePath); err == nil {
+				// File exists, proceed to delete
+				err := os.Remove(filePath)
+				if err != nil {
+					return echo.NewHTTPError(http.StatusBadRequest, err)
+				}
 			}
 		}
 
@@ -285,10 +291,15 @@ func Destroy(c echo.Context) error {
 	}
 
 	if record.Image != "" {
-		err := os.Remove(path + record.Image)
+		filePath := path + record.Image
 
-		if err != nil {
-			return echo.NewHTTPError(http.StatusBadRequest, err)
+		// Check if the file exists
+		if _, err := os.Stat(filePath); err == nil {
+			// File exists, proceed to delete
+			err := os.Remove(filePath)
+			if err != nil {
+				return echo.NewHTTPError(http.StatusBadRequest, err)
+			}
 		}
 	}
 

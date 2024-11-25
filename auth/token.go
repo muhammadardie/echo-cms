@@ -2,13 +2,14 @@ package auth
 
 import (
 	"fmt"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/labstack/echo/v4"
-	"github.com/rs/xid"
 	"net/http"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/dgrijalva/jwt-go"
+	"github.com/labstack/echo/v4"
+	"github.com/rs/xid"
 )
 
 type tokenService struct{}

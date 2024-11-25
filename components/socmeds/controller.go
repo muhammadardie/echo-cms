@@ -2,13 +2,14 @@ package socmeds
 
 import (
 	"context"
+	"net/http"
+	"time"
+
 	"github.com/labstack/echo/v4"
 	DB "github.com/muhammadardie/echo-cms/db"
 	"github.com/muhammadardie/echo-cms/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"net/http"
-	"time"
 )
 
 var ctx = context.Background()
@@ -100,28 +101,34 @@ func Find(c echo.Context) error {
 // @Failure 401 {object} utils.HttpError
 // @Router /socmeds [post]
 func Create(c echo.Context) error {
-	/* store record to db */
-	socmeds := &Socmeds{
-		ID:        primitive.NewObjectID(),
-		Name:      c.FormValue("name"),
-		Icon:      c.FormValue("icon"),
-		Url:       c.FormValue("url"),
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-	}
-
 	db, err := DB.Connect()
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "Fail to connect DB")
 	}
 
-	_, err = db.Collection(colName).InsertOne(ctx, socmeds)
+	// Parse the JSON body into the socmeds struct
+	socmed := new(Socmeds)
+	if err := c.Bind(socmed); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid JSON format")
+	}
+
+	// Validate required fields
+	if err := c.Validate(socmed); err != nil {
+		return echo.NewHTTPError(http.StatusUnprocessableEntity, err.Error())
+	}
+
+	// Set additional fields
+	socmed.ID = primitive.NewObjectID()
+	socmed.CreatedAt = time.Now()
+	socmed.UpdatedAt = time.Now()
+
+	_, err = db.Collection(colName).InsertOne(ctx, socmed)
 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 
-	return c.JSON(http.StatusOK, utils.NewSuccess(socmeds, "Saved"))
+	return c.JSON(http.StatusOK, utils.NewSuccess(socmed, "Saved"))
 }
 
 // Update Socmeds godoc
@@ -152,20 +159,27 @@ func Update(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "Fail to connect DB")
 	}
 
+	changes := new(Socmeds)
+
+	if err := c.Bind(changes); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid JSON format")
+	}
+
+	updateFields := bson.M{
+		"name": changes.Name,
+		"icon": changes.Icon,
+		"url":  changes.Url,
+	}
+
 	selector := bson.M{"_id": id}
+	update := bson.M{"$set": updateFields}
 
-	changes := &Socmeds{
-		Name: c.FormValue("name"),
-		Icon: c.FormValue("icon"),
-		Url:  c.FormValue("url"),
-	}
-
-	update, err := db.Collection(colName).UpdateOne(ctx, selector, bson.M{"$set": changes})
+	result, err := db.Collection(colName).UpdateOne(ctx, selector, update)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err)
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to update user")
 	}
 
-	return c.JSON(http.StatusOK, utils.NewSuccess(update, "Updated"))
+	return c.JSON(http.StatusOK, utils.NewSuccess(result, "Updated"))
 }
 
 // Delete Socmeds godoc

@@ -37,6 +37,9 @@ func main() {
 	// swagger
 	r.GET("/swagger/*", echoSwagger.WrapHandler)
 
+	// Serve files from the 'uploaded_files' directory
+	r.Static("/uploaded_files", "./uploaded_files")
+
 	g := r.Group("/api")
 	g.POST("/login", auth.Login)
 	g.POST("/logout", auth.Logout)

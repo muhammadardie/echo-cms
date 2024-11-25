@@ -2,17 +2,18 @@ package headers
 
 import (
 	"context"
+	"io"
+	"net/http"
+	"os"
+	"path/filepath"
+	"time"
+
 	"github.com/labstack/echo/v4"
 	DB "github.com/muhammadardie/echo-cms/db"
 	"github.com/muhammadardie/echo-cms/utils"
 	"github.com/rs/xid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"io"
-	"net/http"
-	"os"
-	"path/filepath"
-	"time"
 )
 
 var ctx = context.Background()
@@ -192,10 +193,11 @@ func Update(c echo.Context) error {
 	selector := bson.M{"_id": id}
 
 	changes := &Headers{
-		Page:    c.FormValue("page"),
-		Tagline: c.FormValue("tagline"),
-		Tagdesc: c.FormValue("tagdesc"),
-		Image:   "",
+		Page:      c.FormValue("page"),
+		Tagline:   c.FormValue("tagline"),
+		Tagdesc:   c.FormValue("tagdesc"),
+		Image:     "",
+		UpdatedAt: time.Now(),
 	}
 
 	/* check image exist first */
@@ -211,10 +213,20 @@ func Update(c echo.Context) error {
 		}
 
 		if record.Image != "" {
-			err := os.Remove(path + record.Image)
+			filePath := path + record.Image
 
-			if err != nil {
-				return echo.NewHTTPError(http.StatusBadRequest, err)
+			// Ensure the file path exists before attempting deletion
+			if _, err := os.Stat(filePath); err == nil {
+				// File exists, proceed to delete
+				err := os.Remove(filePath)
+				if err != nil {
+					return echo.NewHTTPError(http.StatusBadRequest, "Failed to delete old file: "+err.Error())
+				}
+			} else if os.IsNotExist(err) {
+				// File does not exist, skip deletion
+			} else {
+				// Other errors
+				return echo.NewHTTPError(http.StatusInternalServerError, "Error checking file: "+err.Error())
 			}
 		}
 
@@ -289,10 +301,15 @@ func Destroy(c echo.Context) error {
 	}
 
 	if record.Image != "" {
-		err := os.Remove(path + record.Image)
+		filePath := path + record.Image
 
-		if err != nil {
-			return echo.NewHTTPError(http.StatusBadRequest, err)
+		// Check if the file exists
+		if _, err := os.Stat(filePath); err == nil {
+			// File exists, proceed to delete
+			err := os.Remove(filePath)
+			if err != nil {
+				return echo.NewHTTPError(http.StatusBadRequest, err)
+			}
 		}
 	}
 

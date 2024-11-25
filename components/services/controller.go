@@ -2,13 +2,14 @@ package services
 
 import (
 	"context"
+	"net/http"
+	"time"
+
 	"github.com/labstack/echo/v4"
 	DB "github.com/muhammadardie/echo-cms/db"
 	"github.com/muhammadardie/echo-cms/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"net/http"
-	"time"
 )
 
 var ctx = context.Background()
@@ -100,28 +101,35 @@ func Find(c echo.Context) error {
 // @Failure 401 {object} utils.HttpError
 // @Router /services [post]
 func Create(c echo.Context) error {
-	/* store record to db */
-	services := &Services{
-		ID:        primitive.NewObjectID(),
-		Title:     c.FormValue("title"),
-		Icon:      c.FormValue("icon"),
-		Desc:      c.FormValue("desc"),
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-	}
-
 	db, err := DB.Connect()
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "Fail to connect DB")
 	}
 
-	_, err = db.Collection(colName).InsertOne(ctx, services)
-
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err)
+	// Parse the JSON body into the services struct
+	service := new(Services)
+	if err := c.Bind(service); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid JSON format")
 	}
 
-	return c.JSON(http.StatusOK, utils.NewSuccess(services, "Saved"))
+	// Validate required fields
+	if err := c.Validate(service); err != nil {
+		return echo.NewHTTPError(http.StatusUnprocessableEntity, err.Error())
+	}
+
+	// Set additional fields
+	service.ID = primitive.NewObjectID()
+	service.CreatedAt = time.Now()
+	service.UpdatedAt = time.Now()
+
+	// Insert the user into the database
+	_, err = db.Collection(colName).InsertOne(ctx, service)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to save service")
+	}
+
+	return c.JSON(http.StatusOK, utils.NewSuccess(service, "Saved"))
 }
 
 // Update Services godoc
@@ -152,20 +160,27 @@ func Update(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "Fail to connect DB")
 	}
 
+	changes := new(Services)
+
+	if err := c.Bind(changes); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid JSON format")
+	}
+
+	updateFields := bson.M{
+		"title": changes.Title,
+		"icon":  changes.Icon,
+		"desc":  changes.Desc,
+	}
+
 	selector := bson.M{"_id": id}
+	update := bson.M{"$set": updateFields}
 
-	changes := &Services{
-		Title: c.FormValue("title"),
-		Icon:  c.FormValue("icon"),
-		Desc:  c.FormValue("desc"),
-	}
-
-	update, err := db.Collection(colName).UpdateOne(ctx, selector, bson.M{"$set": changes})
+	result, err := db.Collection(colName).UpdateOne(ctx, selector, update)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err)
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to update service")
 	}
 
-	return c.JSON(http.StatusOK, utils.NewSuccess(update, "Updated"))
+	return c.JSON(http.StatusOK, utils.NewSuccess(result, "Updated"))
 }
 
 // Delete Services godoc

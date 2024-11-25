@@ -2,13 +2,14 @@ package contacts
 
 import (
 	"context"
+	"net/http"
+	"time"
+
 	"github.com/labstack/echo/v4"
 	DB "github.com/muhammadardie/echo-cms/db"
 	"github.com/muhammadardie/echo-cms/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"net/http"
-	"time"
 )
 
 var ctx = context.Background()
@@ -100,28 +101,34 @@ func Find(c echo.Context) error {
 // @Failure 401 {object} utils.HttpError
 // @Router /contacts [post]
 func Create(c echo.Context) error {
-	/* store record to db */
-	contacts := &Contacts{
-		ID:        primitive.NewObjectID(),
-		Address:   c.FormValue("address"),
-		Phone:     c.FormValue("phone"),
-		Mail:      c.FormValue("mail"),
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-	}
-
 	db, err := DB.Connect()
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "Fail to connect DB")
 	}
 
-	_, err = db.Collection(colName).InsertOne(ctx, contacts)
+	// Parse the JSON body into the contacts struct
+	contact := new(Contacts)
+	if err := c.Bind(contact); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid JSON format")
+	}
+
+	// Validate required fields
+	if err := c.Validate(contact); err != nil {
+		return echo.NewHTTPError(http.StatusUnprocessableEntity, err.Error())
+	}
+
+	// Set additional fields
+	contact.ID = primitive.NewObjectID()
+	contact.CreatedAt = time.Now()
+	contact.UpdatedAt = time.Now()
+
+	_, err = db.Collection(colName).InsertOne(ctx, contact)
 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 
-	return c.JSON(http.StatusOK, utils.NewSuccess(contacts, "Saved"))
+	return c.JSON(http.StatusOK, utils.NewSuccess(contact, "Saved"))
 }
 
 // Update Contacts godoc
@@ -152,20 +159,27 @@ func Update(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "Fail to connect DB")
 	}
 
+	changes := new(Contacts)
+
+	if err := c.Bind(changes); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid JSON format")
+	}
+
+	updateFields := bson.M{
+		"address": changes.Address,
+		"phone":   changes.Phone,
+		"mail":    changes.Mail,
+	}
+
 	selector := bson.M{"_id": id}
+	update := bson.M{"$set": updateFields}
 
-	changes := &Contacts{
-		Address: c.FormValue("address"),
-		Phone:   c.FormValue("phone"),
-		Mail:    c.FormValue("mail"),
-	}
-
-	update, err := db.Collection(colName).UpdateOne(ctx, selector, bson.M{"$set": changes})
+	result, err := db.Collection(colName).UpdateOne(ctx, selector, update)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err)
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to update user")
 	}
 
-	return c.JSON(http.StatusOK, utils.NewSuccess(update, "Updated"))
+	return c.JSON(http.StatusOK, utils.NewSuccess(result, "Updated"))
 }
 
 // Delete Contacts godoc

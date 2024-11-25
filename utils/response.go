@@ -1,13 +1,13 @@
 package utils
 
 type HttpError struct {
-	Success bool   `json:"success" default:"false"`
+	Status  bool   `json:"status" default:"false"`
 	Code    int    `json:"code" example:"500"`
 	Message string `json:"message"`
 }
 
 type HttpSuccess struct {
-	Success bool        `json:"success" default:"true"`
+	Status  bool        `json:"status" default:"true"`
 	Code    int         `json:"code" example:"200"`
 	Message string      `json:"message"`
 	Data    interface{} `json:"data" swaggertype:"object"`
@@ -18,7 +18,7 @@ func NewSuccess(data interface{}, message string) *HttpSuccess {
 	formattedMessage := GetMessage(message)
 
 	return &HttpSuccess{
-		Success: true,
+		Status:  true,
 		Code:    200,
 		Message: formattedMessage,
 		Data:    data,
@@ -30,7 +30,7 @@ func NewError(code int, message string) *HttpError {
 	formattedMessage := GetMessage(message)
 
 	return &HttpError{
-		Success: false,
+		Status:  false,
 		Code:    code,
 		Message: formattedMessage,
 	}

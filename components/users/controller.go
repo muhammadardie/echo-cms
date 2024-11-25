@@ -2,14 +2,15 @@ package users
 
 import (
 	"context"
+	"net/http"
+	"time"
+
 	"github.com/labstack/echo/v4"
 	DB "github.com/muhammadardie/echo-cms/db"
 	"github.com/muhammadardie/echo-cms/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
-	"net/http"
-	"time"
 )
 
 var ctx = context.Background()
@@ -41,7 +42,7 @@ func Get(c echo.Context) error {
 
 	defer csr.Close(ctx)
 
-	result := make([]Users, 0)
+	result := make([]PublicUsers, 0)
 	if err = csr.All(ctx, &result); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
@@ -103,41 +104,59 @@ func Find(c echo.Context) error {
 // @Router /users [post]
 func Create(c echo.Context) error {
 
-	/* check password */
-	passValue := c.FormValue("password")
-	if passValue == "" {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Password is required")
-	}
-
-	/* hash password */
-	password := []byte(passValue)
-	hashedPassword, err := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
-
-	/* store record to db */
-	users := &Users{
-		ID:        primitive.NewObjectID(),
-		Username:  c.FormValue("username"),
-		Password:  string(hashedPassword),
-		Email:     c.FormValue("email"),
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-	}
-
-	if err := c.Validate(users); err != nil {
-		return err
-	}
-
+	// Connect to the database
 	db, err := DB.Connect()
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "Fail to connect DB")
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to connect to DB")
 	}
 
-	_, err = db.Collection(colName).InsertOne(ctx, users)
+	// Parse the JSON body into the Users struct
+	users := new(Users)
+	if err := c.Bind(users); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid JSON format")
+	}
 
+	// Validate required fields
+	if err := c.Validate(users); err != nil {
+		return echo.NewHTTPError(http.StatusUnprocessableEntity, err.Error())
+	}
+
+	// Check for unique email
+	if users.Email != "" {
+		emailFilter := bson.M{
+			"email": users.Email,
+		}
+		existingUser := db.Collection(colName).FindOne(ctx, emailFilter)
+		if existingUser.Err() == nil { // Email already exists
+			return echo.NewHTTPError(http.StatusConflict, "Email already exists")
+		}
+	}
+
+	// Check if the password is provided
+	if users.Password == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "Password is required")
+	}
+
+	// Hash the password
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(users.Password), bcrypt.DefaultCost)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err)
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to hash password")
+	}
+	users.Password = string(hashedPassword)
+
+	// Set additional fields
+	users.ID = primitive.NewObjectID()
+	users.CreatedAt = time.Now()
+	users.UpdatedAt = time.Now()
+
+	// Insert the user into the database
+	_, err = db.Collection(colName).InsertOne(ctx, users)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to save user")
 	}
 
+	// Respond with the created user (excluding sensitive data like password)
+	users.Password = "" // Avoid returning the password in the response
 	return c.JSON(http.StatusOK, utils.NewSuccess(users, "Saved"))
 }
 
@@ -170,28 +189,51 @@ func Update(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "Fail to connect DB")
 	}
 
-	selector := bson.M{"_id": id}
+	changes := new(UpdateUser)
 
-	/* hash password */
-	password := []byte(c.FormValue("password"))
-	hashedPassword, err := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
-
-	changes := &Users{
-		Username: c.FormValue("username"),
-		Password: string(hashedPassword),
-		Email:    c.FormValue("email"),
+	if err := c.Bind(changes); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid JSON format")
 	}
 
 	if err := c.Validate(changes); err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusUnprocessableEntity, err.Error())
 	}
 
-	update, err := db.Collection(colName).UpdateOne(ctx, selector, bson.M{"$set": changes})
+	// Check for unique email
+	if changes.Email != "" {
+		emailFilter := bson.M{
+			"email": changes.Email,
+			"_id":   bson.M{"$ne": id}, // Exclude the current user
+		}
+		existingUser := db.Collection(colName).FindOne(ctx, emailFilter)
+		if existingUser.Err() == nil { // Email already exists
+			return echo.NewHTTPError(http.StatusConflict, "Email already exists")
+		}
+	}
+
+	updateFields := bson.M{
+		"username": changes.Username,
+		"email":    changes.Email,
+	}
+
+	// Check if password is provided
+	if changes.Password != "" {
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(changes.Password), bcrypt.DefaultCost)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, "Failed to hash password")
+		}
+		updateFields["password"] = string(hashedPassword)
+	}
+
+	selector := bson.M{"_id": id}
+	update := bson.M{"$set": updateFields}
+
+	result, err := db.Collection(colName).UpdateOne(ctx, selector, update)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err)
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to update user")
 	}
 
-	return c.JSON(http.StatusOK, utils.NewSuccess(update, "Updated"))
+	return c.JSON(http.StatusOK, utils.NewSuccess(result, "Updated successfully"))
 }
 
 // Delete Users godoc
