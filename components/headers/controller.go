@@ -2,6 +2,7 @@ package headers
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -84,6 +85,48 @@ func Find(c echo.Context) error {
 
 	if err = db.Collection(colName).FindOne(ctx, selector).Decode(&record); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
+	}
+
+	return c.JSON(http.StatusOK, utils.NewSuccess(record, ""))
+}
+
+// Find Headers by page godoc
+// @Summary Find header by Page
+// @Description Find header by Page
+// @ID find-headers-by-page
+// @Tags Headers
+// @Accept  json
+// @Produce  json
+// @Security Bearer
+// @Param pagename path string true "Page name of the header to get"
+// @Success 200 {object} utils.HttpSuccess{data=Headers}
+// @Failure 400 {object} utils.HttpError
+// @Failure 401 {object} utils.HttpError
+// @Router /headers/page/{pagename} [get]
+func FindByPage(c echo.Context) error {
+	// Get the page name from the URL parameter
+	pageName := c.Param("pagename")
+
+	if pageName == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "Page name is required")
+	}
+
+	db, err := DB.Connect()
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Fail to connect DB")
+	}
+
+	selector := bson.M{
+		"page": bson.M{
+			"$regex":   fmt.Sprintf("^%s$", pageName),
+			"$options": "i", // Case-insensitive flag
+		},
+	}
+
+	var record Headers
+
+	if err = db.Collection(colName).FindOne(ctx, selector).Decode(&record); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to fetch header")
 	}
 
 	return c.JSON(http.StatusOK, utils.NewSuccess(record, ""))

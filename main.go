@@ -40,6 +40,9 @@ func main() {
 	// Serve files from the 'uploaded_files' directory
 	r.Static("/uploaded_files", "./uploaded_files")
 
+	// Public routes
+	routes.RegisterPublic(r)
+
 	g := r.Group("/api")
 	g.POST("/login", auth.Login)
 	g.POST("/logout", auth.Logout)
